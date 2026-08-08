@@ -137,7 +137,10 @@ function SaveSettingsToCookie() {
 
 function RestoreSettingsFromCookie() {
 	const settingsCookie = localStorage.getItem("settings");
-	if(settingsCookie == null) return;
+	if(settingsCookie == null) {
+		LiveUpdate();
+		return;
+	}
 
 	const settingsObject = JSON.parse(settingsCookie);
 
@@ -254,7 +257,7 @@ Array.prototype.forEach.call(gameWeekRadios, function(radio) {
 var siteHeader = document.getElementById("site-header");
 window.addEventListener("scroll", function() {
 	var shrink = siteHeader.classList.contains("shrink");
-	var shouldShrink = window.scrollY > 40 ? true : (window.scrollY < 20 ? false : shrink);
+	var shouldShrink = window.scrollY > 70 ? true : (window.scrollY < 15 ? false : shrink);
 	if (shouldShrink !== shrink) {
 		siteHeader.classList.toggle("shrink", shouldShrink);
 	}
