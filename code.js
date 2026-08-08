@@ -719,6 +719,18 @@ function ParseGrid() {
 }
 
 function UpdatePrediction() {
+	var blockedCount = 0;
+	for (var i = 0; i < 6; i++) {
+		for (var j = 0; j < 6; j++) {
+			if (window.fhs_grid[i][j] == 1) {
+				blockedCount++;
+			}
+		}
+	}
+	if (blockedCount == 0) {
+		return;
+	}
+
 	var maxScore = 0;
 	for (var i = 0; i < 6; i++) {
 		for (var j = 0; j < 6; j++) {

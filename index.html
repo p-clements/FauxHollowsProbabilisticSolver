@@ -176,6 +176,17 @@
 				</div>
 				<div class="h-separator"></div>
 				<div class="dp-high rounded controls">
+					<div class="game-toggle noselect" role="radiogroup" aria-label="Game version">
+						<label class="game-toggle-option">
+							<input type="radio" id="gameweek1" name="gameweek" value="game1" checked>
+							<span class="game-toggle-caption">First Retelling</span>
+						</label>
+						<label class="game-toggle-option">
+							<input type="radio" id="gameweek2" name="gameweek" value="game2">
+							<span class="game-toggle-caption">Second Retelling</span>
+						</label>
+					</div>
+					<div class="h-separator"></div>
 					<form action id="picker">
 						<div class="radiocontainer noselect">
 							<label id="button1" for="blockedradiobutton" class="radiobuttonlabel optransition" title="Blocked">
@@ -240,15 +251,6 @@
 								<div class="settings-group">
 									<h4>Strategy</h4>
 									<div class="option-row">
-										<input type="radio" id="gameweek1" name="gameweek" value="game1" checked>
-										<label for="gameweek1">Game 1 (hunting retelling)</label>
-									</div>
-									<div class="option-row">
-										<input type="radio" id="gameweek2" name="gameweek" value="game2">
-										<label for="gameweek2">Game 2 (retelling spent)</label>
-									</div>
-									<div class="settings-divider"></div>
-									<div class="option-row">
 										<input type="checkbox" id="spreadsheet">
 										<label for="spreadsheet">Fox Sightings</label>
 									</div>
@@ -302,7 +304,7 @@
 					<h3 style="margin-top: 0">How to Use</h3>
 					<ol style="margin: 0; padding-left: 20px;">
 						<li>Mark the diagonal half of the board the game shows as Blocked.</li>
-						<li>Select Game 1 or Game 2 in the Advanced menu to match where you are in the minigame.</li>
+						<li>Select First Retelling or Second Retelling above the picker to match where you are in the minigame.</li>
 						<li>As you flip cards, select the matching picker item (Missed, Coffer, Swords, Fox) and click the cell.</li>
 						<li>The solver recalculates after every mark and highlights the best cell to flip next with a gold crosshair.</li>
 					</ol>
