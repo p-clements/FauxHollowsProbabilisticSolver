@@ -298,24 +298,17 @@
 				</div>
 				<div class="h-separator"></div>
 				<div class="dp-high rounded about-pane">
-					<h3 style="margin-top: 0">What's New</h3>
-					<span>New sightings feature integrating <a href="https://www.reddit.com/user/Ylandah/">u/Ylandah</a>'s foxes spreadsheet. See the <a href="https://docs.google.com/spreadsheets/d/1mUyCzlzDmdXMwaSTUgWXtEA45oJNn-iB4_bVM43zf58/">spreadsheet</a> or <a href="https://www.reddit.com/r/ffxiv/comments/u1tl10/faux_hollows_fox_location_guide_and_data_gathering/">Reddit post</a> for more information.</span>
-					<h3>About</h3>
-					<span>Faux Hollows minigame solver for FFXIV.</span>
-					<br>
-					<br>
-					<span>The default settings are recommended for most people. Additional options are available in the advanced drop down menu. Most of this contains alternative strategies for focusing on particular game pieces, changing the coffer to a gift box, and more. Feel free to explore.</span>
-					<br>
+					<h3 style="margin-top: 0">How to Use</h3>
+					<span>Pick what you found in the picker below the board (blocked, missed, coffer, swords, fox), then click the matching cells to mark them. The solver recalculates live and highlights the cell it thinks you should flip next. Choose Game 1 or Game 2 in the Advanced menu to match which half of the minigame you're on &mdash; it changes how much the swords piece is worth, since finding it in Game 1 also unlocks Game 2.</span>
+					<h3>How It Scores Cells</h3>
+					<span>Faux Hollows always places its four pieces (fox, coffer, swords, blocked cells) in fixed shapes on the 6x6 board. Every time you mark a cell, the solver narrows down every board layout still consistent with what you've seen, and turns that into a probability that each remaining cell hides the fox, coffer, or swords. Those probabilities are combined using the weights in the Advanced menu, and cells are also zeroed out once you no longer have enough flips left to complete the shape they'd belong to.</span>
 					<h3>Disclaimer</h3>
 					<span>This calculator will NOT guarantee anything. Not a single reward is guaranteed for using this tool. What it provides is a statistical advantage.</span>
-					<br>
-					<h3>Contact</h3>
-					<span>This tool was developed by Fyrin Niyuun @ Behemoth.</span>
-					<br>
-					<span>If there are any issues please contact me on Discord at Sturalke#0249, by submitting an issue on Github, or if you find me in game.</span>
+					<h3>Attribution</h3>
+					<span>Originally developed by Fyrin Niyuun @ Behemoth (<a href="https://github.com/Sturalke/FauxHollowsProbabilisticSolver">Sturalke</a>). This fork replaces the old strategy-preset radios with a single weighted score plus a Game 1/2 sword-value preset, adds a flip counter that zeroes out shapes you can no longer complete in time, and modernizes the layout and styling.</span>
 					<br>
 					<br>
-					<span><a href="https://github.com/Sturalke/FauxHollowsProbabilisticSolver">Github</a> | <a href="https://www.reddit.com/user/Sturalke">u/Sturalke</a></span>
+					<span><a href="https://github.com/Sturalke/FauxHollowsProbabilisticSolver">Upstream on Github</a> | <a href="https://github.com/p-clements/FauxHollowsProbabilisticSolver">This fork</a></span>
 				</div>
 			</div>
 		</div>
