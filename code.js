@@ -253,7 +253,11 @@ Array.prototype.forEach.call(gameWeekRadios, function(radio) {
 
 var siteHeader = document.getElementById("site-header");
 window.addEventListener("scroll", function() {
-	siteHeader.classList.toggle("shrink", window.scrollY > 30);
+	if (window.scrollY > 40) {
+		siteHeader.classList.add("shrink");
+	} else if (window.scrollY < 20) {
+		siteHeader.classList.remove("shrink");
+	}
 });
 
 /*
