@@ -164,6 +164,7 @@ a:active {
 	border-color: gold;
 }
 .radioimage {
+	display: block;
 	width: clamp(32px, 9vw, 50px);
 	height: clamp(32px, 9vw, 50px);
 	padding: 12px;
