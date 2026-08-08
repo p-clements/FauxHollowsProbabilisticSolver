@@ -551,7 +551,7 @@ function UpdateScoresInCells() {
 					state == fhs_verified_state || state == fhs_sighting_state ||
 					state == fhs_prediction_verified_state ||
 					state == fhs_prediction_sighting_state) {
-					span.innerHTML = (window.fhs_grid_scores[i][j] * 100).toFixed(2);
+					span.innerHTML = window.fhs_grid_scores[i][j].toFixed(2);
 				} else {
 					span.innerHTML = "";
 				}
