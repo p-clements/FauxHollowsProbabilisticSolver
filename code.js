@@ -252,11 +252,15 @@ Array.prototype.forEach.call(gameWeekRadios, function(radio) {
 });
 
 var siteHeader = document.getElementById("site-header");
+var siteHeaderLocked = false;
 window.addEventListener("scroll", function() {
-	if (window.scrollY > 40) {
-		siteHeader.classList.add("shrink");
-	} else if (window.scrollY < 20) {
-		siteHeader.classList.remove("shrink");
+	if (siteHeaderLocked) return;
+	var shrink = siteHeader.classList.contains("shrink");
+	var shouldShrink = window.scrollY > 40 ? true : (window.scrollY < 20 ? false : shrink);
+	if (shouldShrink !== shrink) {
+		siteHeader.classList.toggle("shrink", shouldShrink);
+		siteHeaderLocked = true;
+		setTimeout(function() { siteHeaderLocked = false; }, 200);
 	}
 });
 
