@@ -183,6 +183,16 @@ a:active {
 	display: flex;
 	flex-direction: row;
 }
+.flip-counter {
+	flex-grow: 1;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-weight: bold;
+}
+.flip-counter.flip-counter-exhausted {
+	color: rgb(255, 80, 80);
+}
 .advanced-collapse-label {
 	width: 144px;
 	height: 34px;

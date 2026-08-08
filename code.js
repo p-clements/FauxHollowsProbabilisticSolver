@@ -118,27 +118,18 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 function SaveSettingsToCookie() {
-	const strat1Checked = document.getElementById("strat1").checked;
-	const strat2Checked = document.getElementById("strat2").checked;
-	const strat3Checked = document.getElementById("strat3").checked;
-	const strat4Checked = document.getElementById("strat4").checked;
-	const strat5Checked = document.getElementById("strat5").checked;
-
 	const spreadsheetChecked = document.getElementById("spreadsheet").checked;
 	const lookforfoxChecked = document.getElementById("lookforfox").checked;
 	const showstatsChecked = document.getElementById("showstats").checked;
 	const liveupdateChecked = document.getElementById("liveupdate").checked;
+	const gameweek2Checked = document.getElementById("gameweek2").checked;
 
 	const settings = {
-		strat1: strat1Checked,
-		strat2: strat2Checked,
-		strat3: strat3Checked,
-		strat4: strat4Checked,
-		strat5: strat5Checked,
 		spreadsheet: spreadsheetChecked,
 		lookforfox: lookforfoxChecked,
 		showstats: showstatsChecked,
-		liveupdate: liveupdateChecked
+		liveupdate: liveupdateChecked,
+		gameweek2: gameweek2Checked
 	};
 
 	localStorage.setItem("settings", JSON.stringify(settings));
@@ -147,19 +138,17 @@ function SaveSettingsToCookie() {
 function RestoreSettingsFromCookie() {
 	const settingsCookie = localStorage.getItem("settings");
 	if(settingsCookie == null) return;
-	
-	const settingsObject = JSON.parse(settingsCookie);
 
-	document.getElementById("strat1").checked = settingsObject.strat1;
-	document.getElementById("strat2").checked = settingsObject.strat2;
-	document.getElementById("strat3").checked = settingsObject.strat3;
-	document.getElementById("strat4").checked = settingsObject.strat4;
-	document.getElementById("strat5").checked = settingsObject.strat5;
+	const settingsObject = JSON.parse(settingsCookie);
 
 	document.getElementById("spreadsheet").checked = settingsObject.spreadsheet;
 	document.getElementById("lookforfox").checked = settingsObject.lookforfox;
 	document.getElementById("showstats").checked = settingsObject.showstats;
 	document.getElementById("liveupdate").checked = settingsObject.liveupdate;
+
+	document.getElementById("gameweek2").checked = settingsObject.gameweek2;
+	document.getElementById("gameweek1").checked = !settingsObject.gameweek2;
+	applyGameWeekPreset();
 }
 
 
@@ -243,11 +232,6 @@ Array.prototype.forEach.call(buttons, function(rbutton) {
 	rbutton.addEventListener("mouseleave", radioOpacity);
 });
 
-var stratRadios = document.querySelectorAll("input[type=radio][name=strat]");
-Array.prototype.forEach.call(stratRadios, function(strat) {
-	strat.addEventListener("change", LiveUpdate);
-});
-
 var lookForFoxCheck = document.getElementById("lookforfox");
 lookForFoxCheck.addEventListener("click", LiveUpdate);
 
@@ -259,11 +243,12 @@ spreadsheet.addEventListener("click", function() {
 
 var weightFeilds = document.querySelectorAll("input[type=number]");
 Array.prototype.forEach.call(weightFeilds, function(weight) {
-	weight.addEventListener("change", function() {
-		if(document.getElementById("strat5").checked) {
-			LiveUpdate();
-		}
-	});
+	weight.addEventListener("change", LiveUpdate);
+});
+
+var gameWeekRadios = document.querySelectorAll("input[type=radio][name=gameweek]");
+Array.prototype.forEach.call(gameWeekRadios, function(radio) {
+	radio.addEventListener("change", applyGameWeekPreset);
 });
 
 /*
@@ -275,7 +260,9 @@ Array.prototype.forEach.call(weightFeilds, function(weight) {
 
 
 function CellClick() {
-	switch(getPickerMenuItem()) {
+	var wasEmpty = this.getAttribute('data-state') == fhs_empty_state;
+	var pickedItem = getPickerMenuItem();
+	switch(pickedItem) {
 		case "blocked":
 			this.setAttribute('data-state', fhs_blocked_state);
 			break;
@@ -298,8 +285,20 @@ function CellClick() {
 			console.error("Radio button value invalid.");
 			break;
 	}
+	if(wasEmpty && pickedItem != "clear") {
+		window.fhs_flips_used++;
+		UpdateFlipCounter();
+	}
 	UpdateCell(this);
 	LiveUpdate();
+}
+
+const fhs_flip_budget = 11;
+
+function UpdateFlipCounter() {
+	var counter = document.getElementById("flipcounter");
+	counter.textContent = "Flips: " + window.fhs_flips_used + " / " + fhs_flip_budget;
+	counter.classList.toggle("flip-counter-exhausted", window.fhs_flips_used >= fhs_flip_budget);
 }
 
 // Called on MouseEnter and MouseLeave events for each board cell.
@@ -370,15 +369,13 @@ function updateTitles() {
 function UpdateCoffer() {
 	var pickerlabel = document.querySelector("label[for=button3]");
 	var pickerimg = document.getElementById("button3").children[1];
-	var stratlabel = document.querySelector("label[for=strat3]");
 	var weightlabel = document.getElementById("boxweightlabel");
 	var weight = document.getElementById("boxweight");
 	var name = chestOrPresentName();
 	var url = chestOrPresentURL();
-	
+
 	pickerlabel.innerHTML = name;
 	pickerimg.src = url;
-	stratlabel.innerHTML = name;
 	weightlabel.innerHTML = name;
 	
 	if(isCofferSet()) {
@@ -416,6 +413,20 @@ function chestOrPresentURL() {
 	} else {
 		return fhs_present_icon_url;
 	}
+}
+
+// Swords is only worth its 15-leaf payout on its own; in Game 1 finding it also
+// unlocks a whole second game via a retelling, which dwarfs the raw reward.
+const fhs_sword_weight_hunting_retelling = 90;
+const fhs_sword_weight_raw = 15;
+
+function applyGameWeekPreset() {
+	var huntingRetelling = document.getElementById("gameweek1").checked;
+	document.getElementById("swordweight").value = huntingRetelling
+		? fhs_sword_weight_hunting_retelling
+		: fhs_sword_weight_raw;
+	SaveSettingsToCookie();
+	LiveUpdate();
 }
 
 function doFoxSightings() {
@@ -604,6 +615,8 @@ function ResetBoard() {
 	});
 	window.fhs_grid_scores = PrefillArray();
 	UpdateScoresInCells();
+	window.fhs_flips_used = 0;
+	UpdateFlipCounter();
 }
 
 
@@ -620,6 +633,7 @@ function ResetBoard() {
 */
 window.fhs_grid = PrefillArray();
 window.fhs_grid_scores = PrefillArray();
+window.fhs_flips_used = 0;
 
 /*
 	FUNCTIONS
@@ -869,93 +883,17 @@ function MarkGuaranteedBlocks() {
 	
 }
 
-function GetStratNum() {
-	var menuitem = document.querySelector("input[name='strat']:checked").value;
-	var nwf = document.getElementById("lookforfox").checked;
-	
-	if(!nwf) {
-		switch(menuitem) {
-			case "strat1":
-				return 6;
-				break;
-			case "strat2":
-				return 8;
-				break;
-			case "strat3":
-				return 9;
-				break;
-			case "strat4":
-				return 5;
-				break;
-			case "strat5":
-				return 7;
-				break;
-			default:
-				break;
-		}
-	} else {
-		switch(menuitem) {
-			case "strat1":
-				return 1;
-				break;
-			case "strat2":
-				return 3;
-				break;
-			case "strat3":
-				return 4;
-				break;
-			case "strat4":
-				return 5;
-				break;
-			case "strat5":
-				return 2;
-				break;
-			default:
-				break;
-		}
-	}
-	return 1;
-}
-
 function runGuaranteed() {
 	ParseGrid();
-	
+
 	for(var i = 0; i < 2; i++) {
 		MarkGuaranteedBlocks();
 	}
-	
-	var strategy = GetStratNum();
-	switch (strategy) {
-		case 1:
-			window.fhs_grid_scores = FullProbScores(CalculateFullProb());
-			break;
-		case 2:
-			window.fhs_grid_scores = weightedScores(CalculateFullProb());
-			break;
-		case 3:
-			window.fhs_grid_scores = swordsScores(CalculateFullProb());
-			break;
-		case 4:
-			window.fhs_grid_scores = boxScores(CalculateFullProb());
-			break;
-		case 5:
-			window.fhs_grid_scores = foxScores(CalculateFullProb());
-			break;
-		case 6:
-			window.fhs_grid_scores = wfProbScores(CalculateProbWithoutFox());
-			break;
-		case 7:
-			window.fhs_grid_scores = weightedWFScores(CalculateProbWithoutFox());
-			break;
-		case 8:
-			window.fhs_grid_scores = swordsWFScores(CalculateProbWithoutFox());
-			break;
-		case 9:
-			window.fhs_grid_scores = boxWFScores(CalculateProbWithoutFox());
-			break;
-		default:
-			break;
-	}
+
+	var lookingForFox = document.getElementById("lookforfox").checked;
+	window.fhs_grid_scores = lookingForFox
+		? weightedScores(CalculateFullProb())
+		: weightedWFScores(CalculateProbWithoutFox());
 	UpdateScoresInCells();
 	ClearPredictionsAndSightings();
 	UpdatePrediction();
@@ -963,31 +901,47 @@ function runGuaranteed() {
 }
 
 
-// STUB
-function GetChestWeight() {
-	return document.getElementById("boxweight").value;
+function GetFlipsRemaining() {
+	return fhs_flip_budget - window.fhs_flips_used;
 }
 
-// STUB
-function GetSwordsWeight() {
-	return document.getElementById("swordweight").value;
-}
-
-// STUB
-function GetFoxWeight() {
-	return document.getElementById("foxweight").value;
-}
-
-function FullProbScores(probs) {
-	var newScores = PrefillArray();
+// Swords is a 2x3 block (6 cells), coffer is 2x2 (4 cells); once found, the
+// rest of the shape is still hidden but its position is narrowed by
+// NaiiveLargeProb/NaiiveMedProb rather than by this count.
+function MinFlipsToCompleteSwords() {
+	var hitCount = 0;
 	for (var i = 0; i < 6; i++) {
 		for (var j = 0; j < 6; j++) {
-			var newProb = (1 - probs[0][i][j]) * (1 - probs[1][i][j]) * (1 - probs[2][i][j]);
-			newProb = 1 - newProb;
-			newScores[i][j] = newProb;
+			if (window.fhs_grid[i][j] == 4) hitCount++;
 		}
 	}
-	return newScores;
+	return 6 - hitCount;
+}
+
+function MinFlipsToCompleteCoffer() {
+	var hitCount = 0;
+	for (var i = 0; i < 6; i++) {
+		for (var j = 0; j < 6; j++) {
+			if (window.fhs_grid[i][j] == 3) hitCount++;
+		}
+	}
+	return 4 - hitCount;
+}
+
+// A shape that can't be completed with the flips left is worth 0: zeroing its
+// weight here lets weightedScores/weightedWFScores reallocate to reachable targets.
+function GetChestWeight() {
+	var base = Number(document.getElementById("boxweight").value);
+	return MinFlipsToCompleteCoffer() > GetFlipsRemaining() ? 0 : base;
+}
+
+function GetSwordsWeight() {
+	var base = Number(document.getElementById("swordweight").value);
+	return MinFlipsToCompleteSwords() > GetFlipsRemaining() ? 0 : base;
+}
+
+function GetFoxWeight() {
+	return Number(document.getElementById("foxweight").value);
 }
 
 function weightedScores(probs) {
@@ -1003,30 +957,6 @@ function weightedScores(probs) {
 	return newScores;
 }
 
-function swordsScores(probs) {
-	return probs[2];
-}
-
-function boxScores(probs) {
-	return probs[1];
-}
-
-function foxScores(probs) {
-	return probs[0];
-}
-
-function wfProbScores(probs) {
-	var newScores = PrefillArray();
-	for (var i = 0; i < 6; i++) {
-		for (var j = 0; j < 6; j++) {
-			var newProb = (1 - probs[0][i][j]) * (1 - probs[1][i][j]);
-			newProb = 1 - newProb;
-			newScores[i][j] = newProb;
-		}
-	}
-	return newScores;
-}
-
 function weightedWFScores(probs) {
 	var newScores = PrefillArray();
 	for (var i = 0; i < 6; i++) {
@@ -1037,14 +967,6 @@ function weightedWFScores(probs) {
 		}
 	}
 	return newScores;
-}
-
-function swordsWFScores(probs) {
-	return probs[1];
-}
-
-function boxWFScores(probs) {
-	return probs[0];
 }
 
 function NaiiveLargeProb() {

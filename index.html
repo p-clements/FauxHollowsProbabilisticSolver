@@ -217,6 +217,7 @@
 							Advanced
 							<div id="arrow" class="arrow"></div>
 						</label>
+						<span id="flipcounter" class="flip-counter noselect">Flips: 0 / 11</span>
 						<label for="resetbutton" id="resetbuttonlabel" class="reset-button-label noselect">
 							<input id="resetbutton" type="button" />
 							Reset
@@ -229,28 +230,15 @@
 								<h4>Strategy</h4>
 								<div class="settings-container">
 									<div>
-										<input type="radio" id="strat1" name="strat" value="strat1" checked>
-										<label for="strat1">Probability</label>
+										<input type="radio" id="gameweek1" name="gameweek" value="game1" checked>
+										<label for="gameweek1">Game 1 (hunting retelling)</label>
 									</div>
 									<div>
-										<input type="radio" id="strat2" name="strat" value="strat2">
-										<label for="strat2">Swords</label>
-									</div>
-									<div>
-										<input type="radio" id="strat3" name="strat" value="strat3">
-										<label for="strat3">Coffer</label>
-									</div>
-									<div>
-										<input type="radio" id="strat4" name="strat" value="strat4">
-										<label for="strat4">Fox</label>
+										<input type="radio" id="gameweek2" name="gameweek" value="game2">
+										<label for="gameweek2">Game 2 (retelling spent)</label>
 									</div>
 								</div>
 								<div class="settings-container">
-									<div>
-										<input type="radio" id="strat5" name="strat" value="strat5">
-										<label for="strat5">Weighted</label>
-									</div>
-									<div class="psuedo"></div>
 									<div>
 										<input type="checkbox" id="spreadsheet">
 										<label for="spreadsheet">Fox Sightings</label>
@@ -261,7 +249,7 @@
 									</div>
 								</div>
 								<div class="settings-container">
-									
+
 									<div style="width: 140px;">
 										Weights
 										<div>
@@ -273,7 +261,7 @@
 											<label id="boxweightlabel">Coffer</label>
 										</div>
 										<div>
-											<input type="number" id="swordweight" value="30" pattern="[0-9]" min="0" max="100" class="weights">
+											<input type="number" id="swordweight" value="90" pattern="[0-9]" min="0" max="100" class="weights">
 											<label>Swords</label>
 										</div>
 									</div>
