@@ -256,7 +256,7 @@ Array.prototype.forEach.call(gameWeekRadios, function(radio) {
 
 var siteHeader = document.getElementById("site-header");
 var contentPane = document.getElementById("content");
-var fhs_shrink_band = 24; // must exceed 2x the header's expand/shrink height delta, or the toggle can flicker.
+var fhs_shrink_band = 20; // must exceed 2x the header's expand/shrink height delta, or the toggle can flicker.
 
 // Measured against the header's expanded bottom edge (not its current, possibly-shrunk
 // one) so shrinking the header can't move the trigger point and feed back into itself.
@@ -270,6 +270,9 @@ function computeHeaderExpandedBottom() {
 }
 computeHeaderExpandedBottom();
 window.addEventListener("resize", computeHeaderExpandedBottom);
+if (document.fonts && document.fonts.ready) {
+	document.fonts.ready.then(computeHeaderExpandedBottom);
+}
 
 window.addEventListener("scroll", function() {
 	var shrink = siteHeader.classList.contains("shrink");
