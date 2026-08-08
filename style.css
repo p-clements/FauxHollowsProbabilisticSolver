@@ -18,7 +18,7 @@ body {
 	background-attachment: fixed;
 	min-height: 100vh;
 	margin: 0;
-	padding: 20px 12px;
+	padding: calc(20px + env(safe-area-inset-top)) calc(12px + env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) calc(12px + env(safe-area-inset-left));
 	box-sizing: border-box;
 }
 h1, h3 {
