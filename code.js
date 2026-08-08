@@ -1,5 +1,3 @@
-// TODO: Live Update on box type change
-
 const fhs_blocked_icon_url = "images/blocked.png";
 const fhs_missed_icon_url = "images/missed.png";
 const fhs_chest_icon_url = "images/chest.png";
@@ -44,6 +42,96 @@ const fhs_verified_state = "7";
 const fhs_sighting_state = "8";
 const fhs_prediction_verified_state = "9";
 const fhs_prediction_sighting_state = "10";
+
+function IndexFormat(index) {
+	var str = "0" + index;
+	return str.substr(str.length - 2);
+}
+
+function isFlipState(state) {
+	return state === fhs_missed_state
+		|| state === fhs_chest_state
+		|| state === fhs_swords_state
+		|| state === fhs_fox_state;
+}
+
+function canBePredictionTarget(state) {
+	return state === fhs_empty_state
+		|| state === fhs_verified_state
+		|| state === fhs_sighting_state
+		|| state === fhs_prediction_state
+		|| state === fhs_prediction_verified_state
+		|| state === fhs_prediction_sighting_state;
+}
+
+const CELL_META = {
+	[fhs_empty_state]: {
+		name: function() { return fhs_empty_name; },
+		color: fhs_empty_color,
+		icon: function() { return fhs_blank_icon_uri; },
+		diagonalMix: false
+	},
+	[fhs_blocked_state]: {
+		name: function() { return fhs_blocked_name; },
+		color: fhs_blocked_color,
+		icon: function() { return fhs_blocked_icon_url; },
+		diagonalMix: false
+	},
+	[fhs_missed_state]: {
+		name: function() { return fhs_missed_name; },
+		color: fhs_missed_color,
+		icon: function() { return fhs_missed_icon_url; },
+		diagonalMix: false
+	},
+	[fhs_chest_state]: {
+		name: function() { return chestOrPresentName(); },
+		color: fhs_chest_color,
+		icon: function() { return chestOrPresentURL(); },
+		diagonalMix: false
+	},
+	[fhs_swords_state]: {
+		name: function() { return fhs_swords_name; },
+		color: fhs_swords_color,
+		icon: function() { return fhs_swords_icon_url; },
+		diagonalMix: false
+	},
+	[fhs_fox_state]: {
+		name: function() { return fhs_fox_name; },
+		color: fhs_fox_color,
+		icon: function() { return fhs_fox_icon_url; },
+		diagonalMix: false
+	},
+	[fhs_prediction_state]: {
+		name: function() { return fhs_prediction_name; },
+		color: fhs_prediction_color,
+		icon: function() { return fhs_prediction_icon_url; },
+		diagonalMix: false
+	},
+	[fhs_verified_state]: {
+		name: function() { return fhs_verified_name; },
+		color: fhs_verified_color,
+		icon: function() { return fhs_verified_icon_url; },
+		diagonalMix: false
+	},
+	[fhs_sighting_state]: {
+		name: function() { return fhs_sighting_name; },
+		color: fhs_sighting_color,
+		icon: function() { return fhs_sighting_icon_url; },
+		diagonalMix: false
+	},
+	[fhs_prediction_verified_state]: {
+		name: function() { return fhs_prediction_name + " and " + fhs_verified_name; },
+		color: fhs_verified_color,
+		icon: function() { return fhs_prediction_icon_url; },
+		diagonalMix: true
+	},
+	[fhs_prediction_sighting_state]: {
+		name: function() { return fhs_prediction_name + " and " + fhs_sighting_name; },
+		color: fhs_sighting_color,
+		icon: function() { return fhs_prediction_icon_url; },
+		diagonalMix: false
+	}
+};
 
 const fhs_sheet_patterns = [
 	[ 8,10,13,26,35],
@@ -105,53 +193,90 @@ document.addEventListener("keydown", function(event) {
 
 /*
 
-	Settings Cookie Listeners
+	Settings persistence (localStorage)
 
 */
 
 document.getElementById("advancedsettings").addEventListener("change", function()   {
-	SaveSettingsToCookie();
+	SaveSettings();
 });
 
 document.addEventListener("DOMContentLoaded", function() {
-	RestoreSettingsFromCookie();
+	RestoreSettings();
 });
 
-function SaveSettingsToCookie() {
-	const spreadsheetChecked = document.getElementById("spreadsheet").checked;
-	const lookforfoxChecked = document.getElementById("lookforfox").checked;
-	const showstatsChecked = document.getElementById("showstats").checked;
-	const liveupdateChecked = document.getElementById("liveupdate").checked;
-	const gameweek2Checked = document.getElementById("gameweek2").checked;
-
+function SaveSettings() {
+	const collapse = document.getElementById("collapsebox");
 	const settings = {
-		spreadsheet: spreadsheetChecked,
-		lookforfox: lookforfoxChecked,
-		showstats: showstatsChecked,
-		liveupdate: liveupdateChecked,
-		gameweek2: gameweek2Checked
+		spreadsheet: document.getElementById("spreadsheet").checked,
+		lookforfox: document.getElementById("lookforfox").checked,
+		showstats: document.getElementById("showstats").checked,
+		liveupdate: document.getElementById("liveupdate").checked,
+		gameweek2: document.getElementById("gameweek2").checked,
+		foxweight: document.getElementById("foxweight").value,
+		boxweight: document.getElementById("boxweight").value,
+		boxType: document.getElementById("box1").checked ? "coffer" : "present",
+		advancedOpen: !!(collapse && collapse.style.maxHeight)
 	};
-
 	localStorage.setItem("settings", JSON.stringify(settings));
 }
 
-function RestoreSettingsFromCookie() {
-	const settingsCookie = localStorage.getItem("settings");
-	if(settingsCookie == null) {
+function RestoreSettings() {
+	const raw = localStorage.getItem("settings");
+	if (raw == null) {
 		LiveUpdate();
 		return;
 	}
 
-	const settingsObject = JSON.parse(settingsCookie);
+	var settingsObject;
+	try {
+		settingsObject = JSON.parse(raw);
+	} catch (e) {
+		LiveUpdate();
+		return;
+	}
 
-	document.getElementById("spreadsheet").checked = settingsObject.spreadsheet;
-	document.getElementById("lookforfox").checked = settingsObject.lookforfox;
-	document.getElementById("showstats").checked = settingsObject.showstats;
-	document.getElementById("liveupdate").checked = settingsObject.liveupdate;
+	if (typeof settingsObject.spreadsheet === "boolean") {
+		document.getElementById("spreadsheet").checked = settingsObject.spreadsheet;
+	}
+	if (typeof settingsObject.lookforfox === "boolean") {
+		document.getElementById("lookforfox").checked = settingsObject.lookforfox;
+	}
+	if (typeof settingsObject.showstats === "boolean") {
+		document.getElementById("showstats").checked = settingsObject.showstats;
+	}
+	if (typeof settingsObject.liveupdate === "boolean") {
+		document.getElementById("liveupdate").checked = settingsObject.liveupdate;
+	}
 
-	document.getElementById("gameweek2").checked = settingsObject.gameweek2;
+	document.getElementById("gameweek2").checked = !!settingsObject.gameweek2;
 	document.getElementById("gameweek1").checked = !settingsObject.gameweek2;
+
+	if (settingsObject.boxType === "present") {
+		document.getElementById("box2").checked = true;
+	} else {
+		document.getElementById("box1").checked = true;
+	}
+	UpdateCoffer();
+
+	if (settingsObject.foxweight != null) {
+		document.getElementById("foxweight").value = settingsObject.foxweight;
+	}
+	if (settingsObject.boxweight != null) {
+		document.getElementById("boxweight").value = settingsObject.boxweight;
+	}
+
+	// Retelling owns sword weight (overwrites any custom sword value)
 	applyGameWeekPreset();
+
+	if (settingsObject.advancedOpen) {
+		var collapse = document.getElementById("collapsebox");
+		var arrow = document.getElementById("arrow");
+		if (collapse && !collapse.style.maxHeight) {
+			collapse.style.maxHeight = collapse.scrollHeight + "px";
+			if (arrow) arrow.classList.add("arrow-rotated");
+		}
+	}
 }
 
 
@@ -171,6 +296,7 @@ document.getElementById("menucollapse").addEventListener("click", function() {
 	} else {
 		collapse.style.maxHeight = collapse.scrollHeight + "px";
 	}
+	SaveSettings();
 });
 var collapselabel = document.getElementById("collapselabel");
 collapselabel.addEventListener("mousedown", function() {
@@ -216,23 +342,86 @@ resetlabel.addEventListener("mouseleave", removeResetPressed);
 
 /*
 
-	Other Listeners
+	Board construction + other listeners
 
 */
 
-var cells = document.getElementsByClassName('board-cell');
+function buildBoard() {
+	var board = document.getElementById("board");
+	if (!board || board.children.length) {
+		return;
+	}
+	var frag = document.createDocumentFragment();
+	for (var i = 0; i < 36; i++) {
+		var id = IndexFormat(i);
+		var cell = document.createElement("div");
+		cell.id = "cell" + id;
+		cell.className = "board-cell optransition noselect";
+		cell.setAttribute("data-index", id);
+		cell.setAttribute("data-state", fhs_empty_state);
+		cell.setAttribute("title", fhs_empty_name);
+		cell.setAttribute("tabindex", "0");
+		cell.setAttribute("role", "button");
+		cell.setAttribute("aria-label", "Row " + (Math.floor(i / 6) + 1) + ", column " + ((i % 6) + 1) + ", Empty");
+		cell.innerHTML =
+			'<img src="' + fhs_blank_icon_uri + '" alt="" class="board-cell-icon" draggable="false">' +
+			'<span class="board-cell-text"></span>';
+		frag.appendChild(cell);
+	}
+	board.appendChild(frag);
+}
+
+function bindLongPressErase(cell) {
+	var pressTimer = null;
+	var startX = 0;
+	var startY = 0;
+	var moved = false;
+
+	function clearPress() {
+		if (pressTimer) {
+			clearTimeout(pressTimer);
+			pressTimer = null;
+		}
+	}
+
+	cell.addEventListener("pointerdown", function(e) {
+		if (e.pointerType === "mouse" && e.button !== 0) return;
+		moved = false;
+		startX = e.clientX;
+		startY = e.clientY;
+		clearPress();
+		pressTimer = setTimeout(function() {
+			pressTimer = null;
+			if (moved) return;
+			if (cell.getAttribute("data-state") === fhs_empty_state) return;
+			fhs_suppress_click = true;
+			applyCellMark(cell, "clear", true);
+		}, 450);
+	});
+	cell.addEventListener("pointermove", function(e) {
+		if (!pressTimer) return;
+		if (Math.abs(e.clientX - startX) > 10 || Math.abs(e.clientY - startY) > 10) {
+			moved = true;
+			clearPress();
+		}
+	});
+	cell.addEventListener("pointerup", clearPress);
+	cell.addEventListener("pointercancel", clearPress);
+	cell.addEventListener("pointerleave", clearPress);
+}
+
+buildBoard();
+
+var cells = document.getElementsByClassName("board-cell");
 Array.prototype.forEach.call(cells, function(cell) {
 	cell.addEventListener("click", CellClick);
-	cell.addEventListener("mouseenter", cellOpacity);
-	cell.addEventListener("mouseleave", cellOpacity);
-	cell.setAttribute('title', "Empty");
-	cell.setAttribute('data-state', "0");
-});
-
-var buttons = document.getElementsByClassName('radiobuttonlabel');
-Array.prototype.forEach.call(buttons, function(rbutton) {
-	rbutton.addEventListener("mouseenter", radioOpacity);
-	rbutton.addEventListener("mouseleave", radioOpacity);
+	cell.addEventListener("keydown", function(e) {
+		if (e.key === "Enter" || e.key === " ") {
+			e.preventDefault();
+			CellClick.call(cell);
+		}
+	});
+	bindLongPressErase(cell);
 });
 
 var lookForFoxCheck = document.getElementById("lookforfox");
@@ -242,17 +431,47 @@ var spreadsheet = document.getElementById("spreadsheet");
 spreadsheet.addEventListener("click", function() {
 	ClearSightings();
 	UpdateSightings();
+	SaveSettings();
 });
 
 var weightFeilds = document.querySelectorAll("input[type=number]");
 Array.prototype.forEach.call(weightFeilds, function(weight) {
-	weight.addEventListener("change", LiveUpdate);
+	weight.addEventListener("change", function() {
+		LiveUpdate();
+		SaveSettings();
+	});
 });
 
 var gameWeekRadios = document.querySelectorAll("input[type=radio][name=gameweek]");
 Array.prototype.forEach.call(gameWeekRadios, function(radio) {
 	radio.addEventListener("change", applyGameWeekPreset);
 });
+
+document.querySelectorAll('input[name="boxtype"]').forEach(function(radio) {
+	radio.addEventListener("change", function() {
+		UpdateCoffer();
+		SaveSettings();
+		LiveUpdate();
+	});
+});
+
+var showstatsEl = document.getElementById("showstats");
+if (showstatsEl) {
+	showstatsEl.addEventListener("change", function() {
+		ScoresCheckUpdate();
+		SaveSettings();
+	});
+}
+var liveupdateEl = document.getElementById("liveupdate");
+if (liveupdateEl) {
+	liveupdateEl.addEventListener("change", function() {
+		LiveUpdate();
+		ScoresCheckUpdate();
+		SaveSettings();
+	});
+}
+
+document.getElementById("undobutton").addEventListener("click", UndoLast);
 
 var siteHeader = document.getElementById("site-header");
 var contentPane = document.getElementById("content");
@@ -283,7 +502,7 @@ window.addEventListener("scroll", function() {
 	if (shouldShrink !== shrink) {
 		siteHeader.classList.toggle("shrink", shouldShrink);
 	}
-});
+}, { passive: true });
 
 /*
 
@@ -293,43 +512,87 @@ window.addEventListener("scroll", function() {
 
 
 
-function CellClick() {
-	var wasEmpty = this.getAttribute('data-state') == fhs_empty_state;
-	var pickedItem = getPickerMenuItem();
-	switch(pickedItem) {
-		case "blocked":
-			this.setAttribute('data-state', fhs_blocked_state);
-			break;
-		case "missed":
-			this.setAttribute('data-state', fhs_missed_state);
-			break;
-		case "chest":
-			this.setAttribute('data-state', fhs_chest_state);
-			break;
-		case "swords":
-			this.setAttribute('data-state', fhs_swords_state);
-			break;
-		case "fox":
-			this.setAttribute('data-state', fhs_fox_state);
-			break;
-		case "clear":
-			this.setAttribute('data-state', fhs_empty_state);
-			break;
-		default:
-			console.error("Radio button value invalid.");
-			break;
+window.fhs_undo = [];
+const fhs_undo_max = 20;
+var fhs_suppress_click = false;
+
+function pickerItemToState(pickedItem) {
+	switch (pickedItem) {
+		case "blocked": return fhs_blocked_state;
+		case "missed": return fhs_missed_state;
+		case "chest": return fhs_chest_state;
+		case "swords": return fhs_swords_state;
+		case "fox": return fhs_fox_state;
+		case "clear": return fhs_empty_state;
+		default: return null;
 	}
-	var isEmptyNow = pickedItem == "clear";
-	if(wasEmpty && !isEmptyNow) {
-		window.fhs_flips_used++;
-		UpdateFlipCounter();
-	} else if(!wasEmpty && isEmptyNow) {
-		window.fhs_flips_used--;
+}
+
+function pushUndo(cellId, prevState, flipDelta) {
+	window.fhs_undo.push({ id: cellId, prevState: prevState, flipDelta: flipDelta });
+	if (window.fhs_undo.length > fhs_undo_max) {
+		window.fhs_undo.shift();
+	}
+}
+
+function applyCellMark(cell, pickedItem, fromLongPress) {
+	var prevState = cell.getAttribute("data-state");
+	var newState = pickerItemToState(pickedItem);
+	if (newState == null) {
+		console.error("Radio button value invalid.");
+		return;
+	}
+	if (prevState === newState) {
+		return;
+	}
+
+	var wasFlip = isFlipState(prevState);
+	var isFlip = isFlipState(newState);
+	var flipDelta = 0;
+	if (!wasFlip && isFlip) {
+		flipDelta = 1;
+	} else if (wasFlip && !isFlip) {
+		flipDelta = -1;
+	}
+
+	pushUndo(cell.id, prevState, flipDelta);
+	cell.setAttribute("data-state", newState);
+	if (flipDelta !== 0) {
+		window.fhs_flips_used = Math.max(0, window.fhs_flips_used + flipDelta);
 		UpdateFlipCounter();
 	}
-	UpdateCell(this);
+	UpdateCell(cell);
 	LiveUpdate();
 }
+
+function CellClick() {
+	if (fhs_suppress_click) {
+		fhs_suppress_click = false;
+		return;
+	}
+	applyCellMark(this, getPickerMenuItem(), false);
+}
+
+function UndoLast() {
+	var entry = window.fhs_undo.pop();
+	if (!entry) return;
+	var cell = document.getElementById(entry.id);
+	if (!cell) return;
+	cell.setAttribute("data-state", entry.prevState);
+	window.fhs_flips_used = Math.max(0, window.fhs_flips_used - entry.flipDelta);
+	UpdateFlipCounter();
+	UpdateCell(cell);
+	LiveUpdate();
+}
+
+document.addEventListener("keydown", function(event) {
+	var isEditingWeights = document.activeElement && document.activeElement.type === "number";
+	if (isEditingWeights) return;
+	if ((event.ctrlKey || event.metaKey) && (event.key === "z" || event.key === "Z")) {
+		event.preventDefault();
+		UndoLast();
+	}
+});
 
 const fhs_flip_budget = 11;
 
@@ -463,7 +726,7 @@ function applyGameWeekPreset() {
 	document.getElementById("swordweight").value = huntingRetelling
 		? fhs_sword_weight_hunting_retelling
 		: fhs_sword_weight_raw;
-	SaveSettingsToCookie();
+	SaveSettings();
 	LiveUpdate();
 }
 
@@ -482,79 +745,23 @@ function LiveUpdate() {
 }
 
 function UpdateCell(cell) {
-	var cell_index = parseInt(cell.getAttribute("data-index"));
 	var state_value = cell.getAttribute("data-state");
+	var meta = CELL_META[state_value];
 	var childImage = cell.querySelector("img");
-	switch(state_value) {
-		case fhs_empty_state:
-			cell.style.backgroundColor = fhs_empty_color;
-			childImage.setAttribute('src', fhs_blank_icon_uri);
-			cell.setAttribute('title', fhs_empty_name);
-			cell.classList.remove('diagonal-mix');
-			break;
-		case fhs_blocked_state:
-			cell.style.backgroundColor = fhs_blocked_color;
-			childImage.setAttribute('src', fhs_blocked_icon_url);
-			cell.setAttribute('title', fhs_blocked_name);
-			cell.classList.remove('diagonal-mix');
-			break;
-		case fhs_missed_state:
-			cell.style.backgroundColor = fhs_missed_color;
-			childImage.setAttribute('src', fhs_missed_icon_url);
-			cell.setAttribute('title', fhs_missed_name);
-			cell.classList.remove('diagonal-mix');
-			break;
-		case fhs_chest_state:
-			cell.style.backgroundColor = fhs_chest_color;
-			childImage.setAttribute('src', chestOrPresentURL());
-			cell.setAttribute('title', chestOrPresentName());
-			cell.classList.remove('diagonal-mix');
-			break;
-		case fhs_swords_state:
-			cell.style.backgroundColor = fhs_swords_color;
-			childImage.setAttribute('src', fhs_swords_icon_url);
-			cell.setAttribute('title', fhs_swords_name);
-			cell.classList.remove('diagonal-mix');
-			break;
-		case fhs_fox_state:
-			cell.style.backgroundColor = fhs_fox_color;
-			childImage.setAttribute('src', fhs_fox_icon_url);
-			cell.setAttribute('title', fhs_fox_name);
-			cell.classList.remove('diagonal-mix');
-			break;
-		case fhs_prediction_state:
-			cell.style.backgroundColor = fhs_prediction_color;
-			childImage.setAttribute('src', fhs_prediction_icon_url);
-			cell.setAttribute('title', fhs_prediction_name);
-			cell.classList.remove('diagonal-mix');
-			break;
-		case fhs_verified_state:
-			cell.style.backgroundColor = fhs_verified_color;
-			childImage.setAttribute('src', fhs_verified_icon_url);
-			cell.setAttribute('title', fhs_verified_name);
-			cell.classList.remove('diagonal-mix');
-			break;
-		case fhs_sighting_state:
-			cell.style.backgroundColor = fhs_sighting_color;
-			childImage.setAttribute('src', fhs_sighting_icon_url);
-			cell.setAttribute('title', fhs_sighting_name);
-			cell.classList.remove('diagonal-mix');
-			break;
-		case fhs_prediction_verified_state:
-			cell.style.backgroundColor = fhs_verified_color;
-			childImage.setAttribute('src', fhs_prediction_icon_url);
-			cell.setAttribute('title', fhs_prediction_name + " and " + fhs_verified_name);
-			cell.classList.add('diagonal-mix');
-			break;
-		case fhs_prediction_sighting_state:
-			cell.style.backgroundColor = fhs_sighting_color;
-			childImage.setAttribute('src', fhs_prediction_icon_url);
-			cell.setAttribute('title', fhs_prediction_name + " and " + fhs_sighting_name);
-			cell.classList.remove('diagonal-mix');
-			break;
-		default:
-			console.error("Invalid cell state.");
-			break;
+	if (!meta || !childImage) {
+		console.error("Invalid cell state.");
+		return;
+	}
+	var name = meta.name();
+	cell.style.backgroundColor = meta.color;
+	childImage.setAttribute("src", meta.icon());
+	cell.setAttribute("title", name);
+	cell.classList.toggle("diagonal-mix", !!meta.diagonalMix);
+	var idx = parseInt(cell.getAttribute("data-index"), 10);
+	if (!isNaN(idx)) {
+		var row = Math.floor(idx / 6) + 1;
+		var col = (idx % 6) + 1;
+		cell.setAttribute("aria-label", "Row " + row + ", column " + col + ", " + name);
 	}
 }
 
@@ -574,31 +781,38 @@ function ScoresCheckUpdate() {
 }
 
 function UpdateScoresInCells() {
-	if (QueryShowScores()) {
-		for (var i = 0; i < 6; i++) {
-			for (var j = 0; j < 6; j++) {
-				var numStr = IndexFormat(j + 6 * i);
-				var cell = document.getElementById("cell" + numStr);
-				var state = cell.getAttribute("data-state");
-				var span = cell.querySelector("span");
-				if (state == fhs_empty_state || state == fhs_prediction_state ||
-					state == fhs_verified_state || state == fhs_sighting_state ||
-					state == fhs_prediction_verified_state ||
-					state == fhs_prediction_sighting_state) {
-					span.innerHTML = window.fhs_grid_scores[i][j].toFixed(2);
-				} else {
-					span.innerHTML = "";
+	if (!QueryShowScores()) {
+		return;
+	}
+	for (var i = 0; i < 6; i++) {
+		for (var j = 0; j < 6; j++) {
+			var numStr = IndexFormat(j + 6 * i);
+			var cell = document.getElementById("cell" + numStr);
+			var state = cell.getAttribute("data-state");
+			var span = cell.querySelector("span");
+			var next = "";
+			if (canBePredictionTarget(state) || state == fhs_prediction_state ||
+				state == fhs_prediction_verified_state ||
+				state == fhs_prediction_sighting_state ||
+				state == fhs_empty_state || state == fhs_verified_state ||
+				state == fhs_sighting_state) {
+				var v = window.fhs_grid_scores[i][j];
+				if (Number.isFinite(v)) {
+					next = v.toFixed(2);
 				}
+			}
+			if (span.textContent !== next) {
+				span.textContent = next;
 			}
 		}
 	}
 }
 
 function ClearAllCellText() {
-	var cells = document.getElementsByClassName('board-cell');
+	var cells = document.getElementsByClassName("board-cell");
 	Array.prototype.forEach.call(cells, function(cell) {
 		var span = cell.querySelector("span");
-		span.innerHTML = "";
+		if (span) span.textContent = "";
 	});
 }
 
@@ -646,7 +860,7 @@ function QueryShowScores() {
 }
 
 function ResetBoard() {
-	var cells = document.getElementsByClassName('board-cell');
+	var cells = document.getElementsByClassName("board-cell");
 	Array.prototype.forEach.call(cells, function(cell) {
 		cell.setAttribute("data-state", fhs_empty_state);
 		UpdateCell(cell);
@@ -654,7 +868,10 @@ function ResetBoard() {
 	window.fhs_grid_scores = PrefillArray();
 	UpdateScoresInCells();
 	window.fhs_flips_used = 0;
+	window.fhs_undo = [];
 	UpdateFlipCounter();
+	var live = document.getElementById("prediction-live");
+	if (live) live.textContent = "";
 }
 
 
@@ -672,18 +889,13 @@ function ResetBoard() {
 window.fhs_grid = PrefillArray();
 window.fhs_grid_scores = PrefillArray();
 window.fhs_flips_used = 0;
+if (!window.fhs_undo) window.fhs_undo = [];
 
 /*
 	FUNCTIONS
 */
 function PrefillArray() {
 	return new Array(6).fill(0).map(() => new Array(6).fill(0));
-}
-
-function IndexFormat(index) {
-	var str = "0" + (index);
-	str = str.substr(str.length - 2);
-	return str;
 }
 
 function ParseGrid() {
@@ -753,11 +965,12 @@ function UpdatePrediction() {
 				maxScore = Math.max(fhs_grid_scores[i][j], maxScore);
 			} else if (state == fhs_empty_state ||
 					   state == fhs_verified_state ||
-					   state == fhs_sighting_color) {
+					   state == fhs_sighting_state) {
 				maxScore = Math.max(fhs_grid_scores[i][j], maxScore);
 			}
 		}
 	}
+	var suggested = [];
 	if (maxScore != 0) {
 		for (var i = 0; i < 6; i++) {
 			for (var j = 0; j < 6; j++) {
@@ -768,14 +981,28 @@ function UpdatePrediction() {
 				if (isMax && state == fhs_empty_state) {
 					cell.setAttribute("data-state", fhs_prediction_state);
 					UpdateCell(cell);
+					suggested.push([i, j]);
 				} else if (isMax && state == fhs_verified_state) {
 					cell.setAttribute("data-state", fhs_prediction_verified_state);
 					UpdateCell(cell);
+					suggested.push([i, j]);
 				} else if (isMax && state == fhs_sighting_state) {
 					cell.setAttribute("data-state", fhs_prediction_sighting_state);
 					UpdateCell(cell);
+					suggested.push([i, j]);
 				}
 			}
+		}
+	}
+	var live = document.getElementById("prediction-live");
+	if (live) {
+		if (suggested.length) {
+			var parts = suggested.map(function(p) {
+				return "row " + (p[0] + 1) + ", column " + (p[1] + 1);
+			});
+			live.textContent = "Suggested flip: " + parts.join("; ");
+		} else {
+			live.textContent = "No suggestion";
 		}
 	}
 }
@@ -1126,6 +1353,9 @@ function NaiiveLargeProb() {
 			}
 		}
 
+		if (probCount === 0) {
+			return PrefillArray();
+		}
 		for (var i = 0; i < 6; i++) {
 			for (var j = 0; j < 6; j++) {
 				hitMap[i][j] /= probCount;
@@ -1192,6 +1422,9 @@ function NaiiveLargeProb() {
 		}
 	}
 	
+	if (probCount === 0) {
+		return PrefillArray();
+	}
 	for (var i = 0; i < 6; i++) {
 		for (var j = 0; j < 6; j++) {
 			hitMap[i][j] /= probCount;
@@ -1265,6 +1498,9 @@ function NaiiveMedProb() {
 		}
 	}
 	//Turn into probabilities
+	if (count === 0) {
+		return PrefillArray();
+	}
 	for (var i = 0; i < 6; i++) {
 		for (var j = 0; j < 6; j++) {
 			map[i][j] /= count;
@@ -1460,6 +1696,9 @@ function CalculateFullProb() {
 		PrefillArray()
 	];
 
+	if (hitCount === 0) {
+		return probabilityMaps;
+	}
 	for (var i = 0; i < 6; i++) {
 		for (var j = 0; j < 6; j++) {
 			probabilityMaps[0][i][j] = hitMap[i][j][0] / hitCount;
@@ -1623,6 +1862,9 @@ function CalculateProbWithoutFox() {
 		PrefillArray()
 	];
 
+	if (hitCount === 0) {
+		return probabilityMaps;
+	}
 	for (var i = 0; i < 6; i++) {
 		for (var j = 0; j < 6; j++) {
 			probabilityMaps[0][i][j] = hitMap[i][j][0] / hitCount;

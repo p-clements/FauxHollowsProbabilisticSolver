@@ -10,20 +10,26 @@
 	background-color: var(--bg);
 }
 body {
-	font-family: Roboto, sans-serif;
+	font-family: Roboto, system-ui, -apple-system, sans-serif;
 	color: white;
 	background:
 		radial-gradient(ellipse 900px 600px at 15% -5%, rgba(212, 175, 55, 0.16) 0%, transparent 60%),
 		radial-gradient(ellipse 700px 500px at 100% 30%, rgba(79, 209, 227, 0.08) 0%, transparent 60%),
 		radial-gradient(ellipse at 50% -10%, #1b1710 0%, #0b0e14 55%, #07080c 100%);
-	background-attachment: fixed;
+	background-attachment: scroll;
 	min-height: 100vh;
+	min-height: 100dvh;
 	margin: 0;
 	padding: calc(20px + env(safe-area-inset-top)) calc(12px + env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) calc(12px + env(safe-area-inset-left));
 	box-sizing: border-box;
 }
+@media (hover: hover) and (pointer: fine) and (min-width: 900px) {
+	body {
+		background-attachment: fixed;
+	}
+}
 h1, h3 {
-	font-family: 'Cinzel', serif;
+	font-family: Cinzel, "Palatino Linotype", Palatino, serif;
 	color: var(--accent);
 }
 .rounded {
@@ -106,7 +112,17 @@ a:active {
 	justify-content: center;
 	border-radius: 6px;
 	cursor: pointer;
-	transition: background-color var(--speed) cubic-bezier(0.4, 0, 0.3, 1);
+	touch-action: manipulation;
+	-webkit-tap-highlight-color: rgba(212, 175, 55, 0.25);
+	transition: background-color var(--speed) cubic-bezier(0.4, 0, 0.3, 1), opacity var(--speed) ease-out;
+}
+.board-cell:hover,
+.board-cell:active {
+	opacity: 1;
+}
+.board-cell:focus-visible {
+	outline: 2px solid var(--accent);
+	outline-offset: 2px;
 }
 .board-cell-icon {
 	width: 60%;
@@ -430,4 +446,126 @@ input[type=number] {
 }
 .site-header.shrink .about-fox-watermark {
 	opacity: 0.04;
+}
+
+
+/* Sticky controls (picker stays reachable on mobile) */
+.controls-sticky {
+	position: sticky;
+	bottom: 0;
+	z-index: 15;
+	background: rgba(11, 14, 20, 0.92);
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
+	padding-bottom: max(16px, env(safe-area-inset-bottom));
+}
+
+.radiobuttonlabel {
+	touch-action: manipulation;
+}
+.radiobuttonlabel:hover,
+.radiobuttonlabel:active {
+	opacity: 1;
+}
+.radiobuttonlabel {
+	opacity: 0.95;
+}
+
+.game-toggle-option,
+.advanced-collapse-label,
+.reset-button-label,
+.undo-button-label,
+.button-row label,
+input[type="checkbox"],
+input[type="radio"],
+input[type="number"] {
+	touch-action: manipulation;
+}
+
+.undo-button-label {
+	min-width: 90px;
+	height: 34px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: row;
+	cursor: pointer;
+	background-color: var(--panel-high);
+	border: 3px solid transparent;
+	border-radius: 20px;
+	transition: background-color var(--speed) ease-out, border-color var(--speed) ease-out;
+}
+.undo-button-label input {
+	position: absolute;
+	opacity: 0;
+	width: 0;
+	height: 0;
+}
+.undo-button-label:active {
+	background-color: rgba(255, 255, 255, 0.12);
+}
+
+.advanced-collapse-label:focus-within,
+.reset-button-label:focus-within,
+.undo-button-label:focus-within,
+.game-toggle-option:focus-within,
+.radiobuttonlabel:focus-within {
+	outline: 2px solid var(--accent);
+	outline-offset: 2px;
+}
+
+.settings-hint {
+	margin: 0 0 10px 0;
+	font-size: 0.75rem;
+	line-height: 1.35;
+	opacity: 0.75;
+	color: white;
+}
+
+.about-tip {
+	margin: 12px 0 0 0;
+	font-size: 0.95rem;
+	line-height: 1.45;
+	opacity: 0.9;
+}
+
+.sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+@media (max-width: 380px) {
+	.board {
+		gap: 4px;
+	}
+	body {
+		padding-left: calc(8px + env(safe-area-inset-left));
+		padding-right: calc(8px + env(safe-area-inset-right));
+	}
+}
+
+@media (max-width: 320px) {
+	.board {
+		width: 288px;
+		min-width: 288px;
+	}
+	#content {
+		overflow-x: auto;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		transition-duration: 0.01ms !important;
+		animation-duration: 0.01ms !important;
+	}
 }
