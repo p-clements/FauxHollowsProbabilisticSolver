@@ -383,11 +383,11 @@ input[type=number] {
 	transition: font-size var(--speed) ease-out;
 }
 .site-header.shrink {
-	padding-top: 8px;
-	padding-bottom: 8px;
+	padding-top: 11px;
+	padding-bottom: 11px;
 }
 .site-header.shrink h1 {
-	font-size: 1.1rem;
+	font-size: 1.35rem;
 }
 .site-header.shrink .about-fox-watermark {
 	opacity: 0.04;

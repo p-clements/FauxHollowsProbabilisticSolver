@@ -255,9 +255,28 @@ Array.prototype.forEach.call(gameWeekRadios, function(radio) {
 });
 
 var siteHeader = document.getElementById("site-header");
+var contentPane = document.getElementById("content");
+var fhs_shrink_band = 24; // must exceed 2x the header's expand/shrink height delta, or the toggle can flicker.
+
+// Measured against the header's expanded bottom edge (not its current, possibly-shrunk
+// one) so shrinking the header can't move the trigger point and feed back into itself.
+var fhs_header_expanded_bottom = 0;
+function computeHeaderExpandedBottom() {
+	var wasShrink = siteHeader.classList.contains("shrink");
+	if (wasShrink) siteHeader.classList.remove("shrink");
+	var top = parseFloat(getComputedStyle(siteHeader).top) || 0;
+	fhs_header_expanded_bottom = top + siteHeader.offsetHeight;
+	if (wasShrink) siteHeader.classList.add("shrink");
+}
+computeHeaderExpandedBottom();
+window.addEventListener("resize", computeHeaderExpandedBottom);
+
 window.addEventListener("scroll", function() {
 	var shrink = siteHeader.classList.contains("shrink");
-	var shouldShrink = window.scrollY > 70 ? true : (window.scrollY < 15 ? false : shrink);
+	var contentTop = contentPane.getBoundingClientRect().top;
+	var shouldShrink = contentTop <= fhs_header_expanded_bottom
+		? true
+		: (contentTop > fhs_header_expanded_bottom + fhs_shrink_band ? false : shrink);
 	if (shouldShrink !== shrink) {
 		siteHeader.classList.toggle("shrink", shouldShrink);
 	}
