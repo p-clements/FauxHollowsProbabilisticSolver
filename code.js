@@ -10,14 +10,14 @@ const fhs_erase_icon_url = "images/erase.png";
 const fhs_prediction_icon_url = "images/prediction.png";
 const fhs_verified_icon_url = "images/verified.png";
 const fhs_sighting_icon_url = "images/sighting.png";
-const fhs_blank_icon_uri = "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=";
+const fhs_blank_icon_uri = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=";
 
 const fhs_blocked_color = "rgb(140, 140, 140)";
 const fhs_missed_color = "rgb(255, 80, 80)";
 const fhs_chest_color = "rgb(102, 255, 51)";
 const fhs_swords_color = "rgb(51, 204, 255)";
 const fhs_fox_color = "rgb(153, 51, 204)";
-const fhs_empty_color = "rgb(255, 255, 255)";
+const fhs_empty_color = "rgb(237, 225, 200)";
 const fhs_prediction_color = "rgb(255,215,0)";
 const fhs_verified_color = "rgb(255,51,255)";
 const fhs_sighting_color = "rgb(255,153,51)";
@@ -249,6 +249,11 @@ Array.prototype.forEach.call(weightFeilds, function(weight) {
 var gameWeekRadios = document.querySelectorAll("input[type=radio][name=gameweek]");
 Array.prototype.forEach.call(gameWeekRadios, function(radio) {
 	radio.addEventListener("change", applyGameWeekPreset);
+});
+
+var siteHeader = document.getElementById("site-header");
+window.addEventListener("scroll", function() {
+	siteHeader.classList.toggle("shrink", window.scrollY > 30);
 });
 
 /*
