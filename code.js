@@ -285,8 +285,12 @@ function CellClick() {
 			console.error("Radio button value invalid.");
 			break;
 	}
-	if(wasEmpty && pickedItem != "clear") {
+	var isEmptyNow = pickedItem == "clear";
+	if(wasEmpty && !isEmptyNow) {
 		window.fhs_flips_used++;
+		UpdateFlipCounter();
+	} else if(!wasEmpty && isEmptyNow) {
+		window.fhs_flips_used--;
 		UpdateFlipCounter();
 	}
 	UpdateCell(this);
