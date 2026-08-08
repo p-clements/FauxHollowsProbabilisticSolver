@@ -1,85 +1,59 @@
-from __future__ import print_function
-
 import json
 import os.path
-from apiclient import discovery
-from google.oauth2 import service_account
+from googleapiclient import discovery
 from googleapiclient.errors import HttpError
-
-"""
-    Don't judge me. I don't know Python well.
-"""
+from google.oauth2 import service_account
 
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
-# This is necessary. Service worker with Google Sheets API access.
+# Service account is required for read access to the Sheets API.
 SERVICE_ACCOUNT_FILE = 'service_account.json'
 
-# Safe because it's public anyway
-SAMPLE_SPREADSHEET_ID = '1mUyCzlzDmdXMwaSTUgWXtEA45oJNn-iB4_bVM43zf58'
-# Definitely a better way to do this... Oh well.
-SAMPLE_RANGE_NAME = ['\'A ↑ \'!3:56',
-                     '\'A →\'!3:56',
-                     '\'A ↓\'!3:56',
-                     '\'A ←\'!3:56',
-                     '\'B ↑\'!3:40',
-                     '\'B →\'!3:40',
-                     '\'B ↓\'!3:40',
-                     '\'B ←\'!3:40',
-                     '\'C ↑\'!3:47',
-                     '\'C →\'!3:48',
-                     '\'C ↓\'!3:48',
-                     '\'C ←\'!3:48',
-                     '\'D ↑\'!3:56',
-                     '\'D →\'!3:56',
-                     '\'D ↓\'!3:56',
-                     '\'D ←\'!3:56']
+# Safe to hardcode, the sheet is public.
+SPREADSHEET_ID = '1mUyCzlzDmdXMwaSTUgWXtEA45oJNn-iB4_bVM43zf58'
+RANGES = ['\'A ↑ \'!3:56',
+          '\'A →\'!3:56',
+          '\'A ↓\'!3:56',
+          '\'A ←\'!3:56',
+          '\'B ↑\'!3:40',
+          '\'B →\'!3:40',
+          '\'B ↓\'!3:40',
+          '\'B ←\'!3:40',
+          '\'C ↑\'!3:47',
+          '\'C →\'!3:48',
+          '\'C ↓\'!3:48',
+          '\'C ←\'!3:48',
+          '\'D ↑\'!3:56',
+          '\'D →\'!3:56',
+          '\'D ↓\'!3:56',
+          '\'D ←\'!3:56']
 
-"""
-    Sheet color object definitions
-    
-    There's probably a better way to do this.
-"""
-COLOR_OOB = {
-    'red': 0.8509804,
-    'green': 0.8509804,
-    'blue': 0.8509804
+# Sheet cell background colors, mapped to the value used for that cell.
+COLOR_OOB = {'red': 0.8509804, 'green': 0.8509804, 'blue': 0.8509804}
+COLOR_EMPTY = {'red': 1, 'green': 1, 'blue': 1}
+COLOR_BLOCK = {'red': 0.6, 'green': 0.6, 'blue': 0.6}
+COLOR_BOX = {'red': 0.91764706, 'green': 0.6, 'blue': 0.6}
+COLOR_SWORD = {'red': 0.62352943, 'green': 0.77254903, 'blue': 0.9098039}
+COLOR_SWORD_ALT = {'red': 0.6431373, 'green': 0.7607843, 'blue': 0.95686275}
+COLOR_CONF = {'red': 1, 'blue': 1}
+COLOR_POT = {'red': 1, 'green': 0.6}
+
+COLOR_TO_VALUE = {
+    tuple(sorted(COLOR_OOB.items())): 0,
+    tuple(sorted(COLOR_EMPTY.items())): 1,
+    tuple(sorted(COLOR_BLOCK.items())): 2,
+    tuple(sorted(COLOR_BOX.items())): 3,
+    tuple(sorted(COLOR_SWORD.items())): 4,
+    tuple(sorted(COLOR_SWORD_ALT.items())): 4,
+    tuple(sorted(COLOR_CONF.items())): 5,
+    tuple(sorted(COLOR_POT.items())): 6,
 }
-COLOR_EMPTY = {
-    'red': 1,
-    'green': 1,
-    'blue': 1
-}
-COLOR_BLOCK = {
-    'red': 0.6,
-    'green': 0.6,
-    'blue': 0.6
-}
-COLOR_BOX = {
-    'red': 0.91764706,
-    'green': 0.6,
-    'blue': 0.6
-}
-COLOR_SWORD = {
-    'red': 0.62352943,
-    'green': 0.77254903,
-    'blue': 0.9098039
-}
-COLOR_SWORD_ALT = {
-    'red': 0.6431373,
-    'green': 0.7607843,
-    'blue': 0.95686275
-}
-COLOR_CONF = {
-    'red': 1,
-    'blue': 1
-}
-COLOR_POT = {
-    'red': 1,
-    'green': 0.6
-}
-"""
-    End color definitions
-"""
+
+
+def color_to_value(color):
+    val = COLOR_TO_VALUE.get(tuple(sorted(color.items())), -1)
+    if val == -1:
+        print(color)
+    return val
 
 
 def main():
@@ -88,56 +62,30 @@ def main():
         credentials = service_account.Credentials.from_service_account_file(secret_file, scopes=SCOPES)
         service = discovery.build('sheets', 'v4', credentials=credentials)
 
-        # Call the Sheets API
-        include_grid_data = True
         sheet = service.spreadsheets()
-        result = sheet.get(spreadsheetId=SAMPLE_SPREADSHEET_ID,
-                           ranges=SAMPLE_RANGE_NAME,
-                           includeGridData=include_grid_data).execute()
+        result = sheet.get(spreadsheetId=SPREADSHEET_ID,
+                           ranges=RANGES,
+                           includeGridData=True).execute()
         if not result:
             print('No data found.')
             return
 
-        # Manually extract background color data
+        # Extract background color data as raw values per cell.
         color_arr = []
-        for sheet in result['sheets']:
+        for sheet_data in result['sheets']:
             color_sheet = []
-            for row in sheet['data'][0]['rowData']:
-                color_row = []
-                for cell in row['values']:
-                    col = cell['effectiveFormat']['backgroundColor']
-                    val = 0
-                    if col == COLOR_OOB:
-                        val = 0
-                    elif col == COLOR_EMPTY:
-                        val = 1
-                    elif col == COLOR_BLOCK:
-                        val = 2
-                    elif col == COLOR_BOX:
-                        val = 3
-                    elif col == COLOR_SWORD:
-                        val = 4
-                    elif col == COLOR_SWORD_ALT:
-                        val = 4
-                    elif col == COLOR_CONF:
-                        val = 5
-                    elif col == COLOR_POT:
-                        val = 6
-                    else:
-                        val = -1
-                        print(col)
-                    color_row.append(val)
+            for row in sheet_data['data'][0]['rowData']:
+                color_row = [color_to_value(cell['effectiveFormat']['backgroundColor']) for cell in row['values']]
                 color_sheet.append(color_row)
             color_arr.append(color_sheet)
 
-        # This whole section is fucked.
-        # Not looking forward to fixing if it breaks.
+        # Each sheet packs several board layouts, separated by blank rows/columns.
+        # Walk the grid and split it back out into individual boards.
         final_arr = []
         for c_sheet in color_arr:
             orientation = []
             current_boards = []
             repeat_empty_row = True
-            current_board_index = 0
             current_board_row_index = 0
             for c_row in c_sheet:
                 current_board_index = 0
@@ -148,24 +96,9 @@ def main():
                     if not elem == 0:
                         empty_row = False
                         repeat_empty_row = False
-                        val = -1
-                        if elem == 1:
-                            val = 0
-                        elif elem == 2:
-                            val = 1
-                        elif elem == 3:
-                            val = 2
-                        elif elem == 4:
-                            val = 3
-                        elif elem == 5:
-                            val = 4
-                        elif elem == 6:
-                            val = 5
-                        else:
-                            val = -1
+                        val = elem - 1 if 1 <= elem <= 6 else -1
                         current_board_row.append(val)
                         current_board_row_written = False
-                        # If you're actually reading through this, why?
                     else:
                         if not empty_row:
                             if not current_board_row_written:
@@ -176,7 +109,6 @@ def main():
                                                                                current_board_row)
                                 current_board_row_written = True
                                 current_board_row = []
-                                # This isn't worth your sanity.
                             current_board_index = current_board_index + 1
                 if empty_row:
                     if not repeat_empty_row:
