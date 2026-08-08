@@ -10,7 +10,7 @@ const fhs_erase_icon_url = "images/erase.png";
 const fhs_prediction_icon_url = "images/prediction.png";
 const fhs_verified_icon_url = "images/verified.png";
 const fhs_sighting_icon_url = "images/sighting.png";
-const fhs_blank_icon_uri = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=";
+const fhs_blank_icon_uri = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVR4nGNgAAIAAAUAAXpeqz8AAAAASUVORK5CYII=";
 
 const fhs_blocked_color = "rgb(140, 140, 140)";
 const fhs_missed_color = "rgb(255, 80, 80)";
