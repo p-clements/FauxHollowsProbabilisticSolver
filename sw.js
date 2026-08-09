@@ -1,9 +1,9 @@
-const CACHE = "fhs-v19";
+const CACHE = "fhs-v20";
 const ASSETS = [
 	"./",
 	"./index.html",
-	"./style.css?v=19",
-	"./code.js?v=19",
+	"./style.css?v=20",
+	"./code.js?v=20",
 	"./data.js",
 	"./manifest.json",
 	"./images/blocked.png",
@@ -24,25 +24,35 @@ const ASSETS = [
 
 self.addEventListener("install", function (e) {
 	e.waitUntil(
-		caches.open(CACHE).then(function (c) {
-			return c.addAll(ASSETS);
-		}).then(function () {
-			return self.skipWaiting();
-		})
+		caches
+			.open(CACHE)
+			.then(function (c) {
+				return c.addAll(ASSETS);
+			})
+			.then(function () {
+				return self.skipWaiting();
+			})
 	);
 });
 
 self.addEventListener("activate", function (e) {
 	e.waitUntil(
-		caches.keys().then(function (keys) {
-			return Promise.all(
-				keys.filter(function (k) { return k !== CACHE; }).map(function (k) {
-					return caches.delete(k);
-				})
-			);
-		}).then(function () {
-			return self.clients.claim();
-		})
+		caches
+			.keys()
+			.then(function (keys) {
+				return Promise.all(
+					keys
+						.filter(function (k) {
+							return k !== CACHE;
+						})
+						.map(function (k) {
+							return caches.delete(k);
+						})
+				);
+			})
+			.then(function () {
+				return self.clients.claim();
+			})
 	);
 });
 
@@ -50,9 +60,12 @@ self.addEventListener("fetch", function (e) {
 	if (e.request.method !== "GET") return;
 	e.respondWith(
 		caches.match(e.request).then(function (cached) {
-			return cached || fetch(e.request).then(function (res) {
-				return res;
-			});
+			return (
+				cached ||
+				fetch(e.request).then(function (res) {
+					return res;
+				})
+			);
 		})
 	);
 });
