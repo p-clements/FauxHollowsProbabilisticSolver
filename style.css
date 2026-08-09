@@ -189,6 +189,8 @@ a:active {
 	border-color: transparent;
 }
 .radiocaption {
+	display: block;
+	margin-top: 6px;
 	text-align: center;
 	font-size: clamp(11px, 3vw, 14px);
 }
