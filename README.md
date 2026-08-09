@@ -27,6 +27,8 @@ Refactored scoring, retelling presets, mobile-friendly UI, and GitHub Pages host
 - After UI/logic changes, bump the CSS and JS `?v=` values in `index.html` and the matching `CACHE`/asset versions in `sw.js` (same N; see `<!-- asset-version: N -->`)
 - Never commit `service_account.json` (Sheets scraper); listed in `.gitignore`
 
+`data.js` is the checked-in runtime snapshot used by the app. The Google Sheet is only an optional source for refreshing that snapshot; the app does not depend on it being available at runtime. `scraper.py` validates a refresh and atomically replaces `data.js` only after it succeeds, so a failed refresh leaves the existing snapshot untouched.
+
 ## Local preview
 
 ```bash
