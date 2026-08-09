@@ -513,14 +513,25 @@ window.addEventListener("scroll", function() {
 // at rest.  Otherwise leaving the panel in normal flow is safer than allowing a
 // tall sticky element to cover the board on short or mobile viewports.
 var controlsBarEl = document.querySelector(".controls-sticky");
+var controlsStickyMedia = window.matchMedia
+	? window.matchMedia("(min-width: 900px) and (hover: hover) and (pointer: fine)")
+	: null;
 function updateControlsSticky() {
 	if (!controlsBarEl) return;
 	controlsBarEl.classList.remove("controls-sticky-active");
+	if (!controlsStickyMedia || !controlsStickyMedia.matches) return;
 	var normalBottom = controlsBarEl.getBoundingClientRect().bottom;
 	controlsBarEl.classList.toggle("controls-sticky-active", normalBottom <= window.innerHeight);
 }
 updateControlsSticky();
 window.addEventListener("resize", updateControlsSticky);
+if (controlsStickyMedia) {
+	if (controlsStickyMedia.addEventListener) {
+		controlsStickyMedia.addEventListener("change", updateControlsSticky);
+	} else if (controlsStickyMedia.addListener) {
+		controlsStickyMedia.addListener(updateControlsSticky);
+	}
+}
 if (controlsBarEl && window.ResizeObserver) {
 	new ResizeObserver(updateControlsSticky).observe(controlsBarEl);
 }
