@@ -10,6 +10,9 @@ Place information into the grid as it is uncovered in game. Yellow squares with 
 
 Blocked cells do not consume flips. Long-press a cell to erase it, or use **Undo** for the last mark.
 
+When the solver fills a coffer or swords shape by deduction, select the matching picker item and click an
+inferred cell to record that you have actually flipped it; only confirmed flips use the budget.
+
 ### Credits
 
 Fork of [Sturalke’s original solver](https://github.com/Sturalke/FauxHollowsProbabilisticSolver)
