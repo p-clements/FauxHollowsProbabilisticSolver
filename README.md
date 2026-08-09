@@ -6,7 +6,7 @@ Statistical tool for solving a mini-game in Final Fantasy XIV.
 
 Place information into the grid as it is uncovered in game. Yellow squares with a crosshair are the solver’s suggested next flip.
 
-**First Retelling / Second Retelling** (above the picker) sets sword value for where you are in the minigame. Open **Advanced** for Fox Sightings, weights, and stats.
+**First Retelling / Second Retelling** (above the picker) sets sword value for where you are in the minigame. Open **Advanced** for Fox Sightings, strategy values, and stats.
 
 Blocked cells do not consume flips. Long-press a cell to erase it, or use **Undo** for the last mark.
 

@@ -1,7 +1,6 @@
 const fhs_blocked_icon_url = "images/blocked.png";
 const fhs_missed_icon_url = "images/missed.png";
 const fhs_chest_icon_url = "images/chest.png";
-const fhs_present_icon_url = "images/present.png";
 const fhs_swords_icon_url = "images/swords.png";
 const fhs_fox_icon_url = "images/fox.png";
 const fhs_erase_icon_url = "images/erase.png";
@@ -24,7 +23,6 @@ const fhs_sighting_color = "rgb(255,153,51)";
 const fhs_blocked_name = "Blocked";
 const fhs_missed_name = "Missed";
 const fhs_chest_name = "Coffer";
-const fhs_present_name = "Gift Box";
 const fhs_swords_name = "Swords";
 const fhs_fox_name = "Fox";
 const fhs_empty_name = "Empty";
@@ -99,11 +97,11 @@ const CELL_META = {
 	},
 	[fhs_chest_state]: {
 		name: function () {
-			return chestOrPresentName();
+			return fhs_chest_name;
 		},
 		color: fhs_chest_color,
 		icon: function () {
-			return chestOrPresentURL();
+			return fhs_chest_icon_url;
 		},
 		diagonalMix: false
 	},
@@ -260,8 +258,6 @@ function SaveSettings() {
 		liveupdate: document.getElementById("liveupdate").checked,
 		gameweek2: document.getElementById("gameweek2").checked,
 		foxweight: String(normalizeWeightInput("foxweight", 100)),
-		boxweight: String(normalizeWeightInput("boxweight", isCofferSet() ? 35 : 25)),
-		boxType: document.getElementById("box1").checked ? "coffer" : "present",
 		advancedOpen: !!(collapse && collapse.style.maxHeight)
 	};
 	localStorage.setItem("settings", JSON.stringify(settings));
@@ -298,18 +294,8 @@ function RestoreSettings() {
 	document.getElementById("gameweek2").checked = !!settingsObject.gameweek2;
 	document.getElementById("gameweek1").checked = !settingsObject.gameweek2;
 
-	if (settingsObject.boxType === "present") {
-		document.getElementById("box2").checked = true;
-	} else {
-		document.getElementById("box1").checked = true;
-	}
-	UpdateCoffer();
-
 	if (settingsObject.foxweight != null) {
 		document.getElementById("foxweight").value = settingsObject.foxweight;
-	}
-	if (settingsObject.boxweight != null) {
-		document.getElementById("boxweight").value = settingsObject.boxweight;
 	}
 
 	// Retelling owns sword weight (overwrites any custom sword value)
@@ -495,14 +481,6 @@ Array.prototype.forEach.call(weightFeilds, function (weight) {
 var gameWeekRadios = document.querySelectorAll("input[type=radio][name=gameweek]");
 Array.prototype.forEach.call(gameWeekRadios, function (radio) {
 	radio.addEventListener("change", applyGameWeekPreset);
-});
-
-document.querySelectorAll('input[name="boxtype"]').forEach(function (radio) {
-	radio.addEventListener("change", function () {
-		UpdateCoffer();
-		SaveSettings();
-		LiveUpdate();
-	});
 });
 
 var showstatsEl = document.getElementById("showstats");
@@ -766,7 +744,7 @@ function updateTitles() {
 				cell.setAttribute("title", fhs_missed_name);
 				break;
 			case fhs_chest_state:
-				cell.setAttribute("title", chestOrPresentName());
+				cell.setAttribute("title", fhs_chest_name);
 				break;
 			case fhs_swords_state:
 				cell.setAttribute("title", fhs_swords_name);
@@ -793,54 +771,6 @@ function updateTitles() {
 				break;
 		}
 	});
-}
-
-function UpdateCoffer() {
-	var pickerlabel = document.querySelector("label.radiocaption[for=chestradiobutton]");
-	var pickerimg = document.getElementById("button3").children[1];
-	var weightlabel = document.getElementById("boxweightlabel");
-	var weight = document.getElementById("boxweight");
-	var name = chestOrPresentName();
-	var url = chestOrPresentURL();
-
-	pickerlabel.innerHTML = name;
-	pickerimg.src = url;
-	weightlabel.innerHTML = name;
-
-	if (isCofferSet()) {
-		weight.value = 35;
-	} else {
-		weight.value = 25;
-	}
-
-	var cells = document.getElementsByClassName("board-cell");
-	Array.prototype.forEach.call(cells, function (cell) {
-		var state_value = cell.getAttribute("data-state");
-		if (state_value == fhs_chest_state) {
-			// Re-apply all state-derived cell metadata, including aria-label.
-			UpdateCell(cell);
-		}
-	});
-}
-
-function isCofferSet() {
-	return document.getElementById("box1").checked;
-}
-
-function chestOrPresentName() {
-	if (isCofferSet()) {
-		return fhs_chest_name;
-	} else {
-		return fhs_present_name;
-	}
-}
-
-function chestOrPresentURL() {
-	if (isCofferSet()) {
-		return fhs_chest_icon_url;
-	} else {
-		return fhs_present_icon_url;
-	}
 }
 
 // Swords is only worth its 15-leaf payout on its own; in Game 1 finding it also
@@ -1351,11 +1281,11 @@ function normalizeWeightInput(id, fallback) {
 	return value;
 }
 
-// A shape that can't be completed with the flips left is worth 0: zeroing its
-// weight here lets weightedScores/weightedWFScores reallocate to reachable targets.
-function GetChestWeight() {
-	var base = normalizeWeightInput("boxweight", isCofferSet() ? 35 : 25);
-	return MinFlipsToCompleteCoffer() > GetFlipsRemaining() ? 0 : base;
+// A coffer is always the medium reward in this solver. Its fixed reward value
+// is used for expected-value scoring; it is not a user-adjustable setting.
+const fhs_coffer_value = 35;
+function GetCofferValue() {
+	return MinFlipsToCompleteCoffer() > GetFlipsRemaining() ? 0 : fhs_coffer_value;
 }
 
 function GetSwordsWeight() {
@@ -1373,14 +1303,14 @@ function GetFoxWeight() {
 function weightedScores(probs) {
 	var newScores = PrefillArray();
 	var foxWeight = GetFoxWeight();
-	var boxWeight = GetChestWeight();
+	var cofferValue = GetCofferValue();
 	var swordsWeight = GetSwordsWeight();
 	for (var i = 0; i < 6; i++) {
 		for (var j = 0; j < 6; j++) {
 			var foxWeighted = probs[0][i][j] * foxWeight;
-			var boxWeighted = probs[1][i][j] * boxWeight;
+			var cofferWeighted = probs[1][i][j] * cofferValue;
 			var swordsWeighted = probs[2][i][j] * swordsWeight;
-			newScores[i][j] = foxWeighted + boxWeighted + swordsWeighted;
+			newScores[i][j] = foxWeighted + cofferWeighted + swordsWeighted;
 		}
 	}
 	return newScores;
@@ -1388,13 +1318,13 @@ function weightedScores(probs) {
 
 function weightedWFScores(probs) {
 	var newScores = PrefillArray();
-	var boxWeight = GetChestWeight();
+	var cofferValue = GetCofferValue();
 	var swordsWeight = GetSwordsWeight();
 	for (var i = 0; i < 6; i++) {
 		for (var j = 0; j < 6; j++) {
-			var boxWeighted = probs[0][i][j] * boxWeight;
+			var cofferWeighted = probs[0][i][j] * cofferValue;
 			var swordsWeighted = probs[1][i][j] * swordsWeight;
-			newScores[i][j] = boxWeighted + swordsWeighted;
+			newScores[i][j] = cofferWeighted + swordsWeighted;
 		}
 	}
 	return newScores;
@@ -2011,6 +1941,5 @@ function CalculateProbWithoutFox() {
 */
 function StartUp() {
 	ResetBoard();
-	UpdateCoffer();
 }
 StartUp();
