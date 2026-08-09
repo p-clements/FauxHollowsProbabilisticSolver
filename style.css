@@ -440,6 +440,7 @@ input[type="number"] {
 .site-header {
 	position: sticky;
 	top: 4px;
+	top: max(4px, env(safe-area-inset-top, 0px));
 	z-index: 20;
 	width: 100%;
 	box-sizing: border-box;
