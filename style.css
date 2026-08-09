@@ -464,6 +464,11 @@ input[type=number] {
 	position: sticky;
 	bottom: 0;
 }
+@media (max-width: 899px), (hover: none), (pointer: coarse) {
+	.controls-sticky.controls-sticky-active {
+		position: static;
+	}
+}
 
 .radiobuttonlabel {
 	touch-action: manipulation;
