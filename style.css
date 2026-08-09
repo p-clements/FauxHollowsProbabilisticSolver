@@ -98,7 +98,7 @@ a:active {
 	grid-template-columns: repeat(6, 1fr);
 	grid-template-rows: repeat(6, 1fr);
 	gap: 8px;
-	width: min(100%, 600px);
+	width: min(100%, 600px, var(--fhs-board-max, 600px));
 	aspect-ratio: 1;
 	margin: 0 auto;
 }

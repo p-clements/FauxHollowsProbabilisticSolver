@@ -275,6 +275,7 @@ function RestoreSettings() {
 		if (collapse && !collapse.style.maxHeight) {
 			collapse.style.maxHeight = collapse.scrollHeight + "px";
 			if (arrow) arrow.classList.add("arrow-rotated");
+			updateBoardMax();
 		}
 	}
 }
@@ -296,6 +297,7 @@ document.getElementById("menucollapse").addEventListener("click", function() {
 	} else {
 		collapse.style.maxHeight = collapse.scrollHeight + "px";
 	}
+	updateBoardMax();
 	SaveSettings();
 });
 var collapselabel = document.getElementById("collapselabel");
@@ -503,6 +505,33 @@ window.addEventListener("scroll", function() {
 		siteHeader.classList.toggle("shrink", shouldShrink);
 	}
 }, { passive: true });
+
+// The picker bar is position: sticky so it stays reachable while scrolling the board.
+// A sticky bottom element docks at the viewport's bottom edge as soon as its normal
+// position would otherwise fall below the fold - reserving space *before* it in the
+// flow doesn't stop that, since the dock point is measured from the viewport, not from
+// how much room precedes the bar. So instead of reserving space for the bar, cap the
+// board so the header, board, gap, and bar all fit within one viewport at rest; sticky
+// only engages once content genuinely exceeds the viewport (e.g. Advanced expanded on
+// a short screen), which is what it's for.
+var controlsBarEl = document.querySelector(".controls-sticky");
+var boardGapEl = document.querySelector(".h-separator");
+var boardEl = document.getElementById("board");
+function updateBoardMax() {
+	if (!boardEl || !controlsBarEl || !boardGapEl) return;
+	var boardTop = boardEl.getBoundingClientRect().top + window.scrollY;
+	var contentBottomPad = parseFloat(getComputedStyle(contentPane).paddingBottom) || 0;
+	var bodyBottomPad = parseFloat(getComputedStyle(document.body).paddingBottom) || 0;
+	var available = window.innerHeight - boardTop - boardGapEl.offsetHeight - controlsBarEl.offsetHeight - contentBottomPad - bodyBottomPad;
+	document.documentElement.style.setProperty("--fhs-board-max", Math.max(220, Math.floor(available)) + "px");
+}
+if (controlsBarEl) {
+	updateBoardMax();
+	window.addEventListener("resize", updateBoardMax);
+	if (window.ResizeObserver) {
+		new ResizeObserver(updateBoardMax).observe(controlsBarEl);
+	}
+}
 
 /*
 

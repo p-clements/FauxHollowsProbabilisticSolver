@@ -1,9 +1,9 @@
-const CACHE = "fhs-v8";
+const CACHE = "fhs-v10";
 const ASSETS = [
 	"./",
 	"./index.html",
-	"./style.css?v=8",
-	"./code.js?v=8",
+	"./style.css?v=10",
+	"./code.js?v=10",
 	"./data.js",
 	"./manifest.json",
 	"./images/blocked.png",
