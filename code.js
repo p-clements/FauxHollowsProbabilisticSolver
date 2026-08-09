@@ -656,6 +656,15 @@ function applyCellMark(cell, pickedItem, fromLongPress) {
 		return;
 	}
 	if (prevState === newState) {
+		// A solver-filled piece is a deduction until the player confirms the flip.
+		if (prevSolverFilled && isFlipState(prevState)) {
+			pushUndo(cell.id, prevState, 1, true);
+			cell.removeAttribute("data-solver-filled");
+			window.fhs_flips_used += 1;
+			UpdateFlipCounter();
+			UpdateCell(cell);
+			LiveUpdate();
+		}
 		return;
 	}
 
@@ -1023,6 +1032,17 @@ function PrefillArray() {
 	return new Array(6).fill(0).map(() => new Array(6).fill(0));
 }
 
+function ClearSolverFilledCells() {
+	var cells = document.getElementsByClassName("board-cell");
+	Array.prototype.forEach.call(cells, function (cell) {
+		if (cell.getAttribute("data-solver-filled") === "true") {
+			cell.setAttribute("data-state", fhs_empty_state);
+			cell.removeAttribute("data-solver-filled");
+			UpdateCell(cell);
+		}
+	});
+}
+
 function ParseGrid() {
 	window.fhs_grid = PrefillArray();
 	for (var i = 0; i < 6; i++) {
@@ -1278,6 +1298,7 @@ function MarkGuaranteedBlocks() {
 }
 
 function runGuaranteed() {
+	ClearSolverFilledCells();
 	ParseGrid();
 
 	for (var i = 0; i < 2; i++) {
@@ -1298,27 +1319,26 @@ function GetFlipsRemaining() {
 	return fhs_flip_budget - window.fhs_flips_used;
 }
 
-// Swords is a 2x3 block (6 cells), coffer is 2x2 (4 cells); once found, the
-// rest of the shape is still hidden but its position is narrowed by
-// NaiiveLargeProb/NaiiveMedProb rather than by this count.
-function MinFlipsToCompleteSwords() {
+function countConfirmedPieceCells(state) {
 	var hitCount = 0;
 	for (var i = 0; i < 6; i++) {
 		for (var j = 0; j < 6; j++) {
-			if (window.fhs_grid[i][j] == 4) hitCount++;
+			if (window.fhs_grid[i][j] != state) continue;
+			var cell = document.getElementById("cell" + IndexFormat(j + 6 * i));
+			if (cell.getAttribute("data-solver-filled") !== "true") hitCount++;
 		}
 	}
-	return 6 - hitCount;
+	return hitCount;
+}
+
+// Swords is a 2x3 block (6 cells), coffer is 2x2 (4 cells). Solver-filled
+// cells are deductions until the player confirms the corresponding flips.
+function MinFlipsToCompleteSwords() {
+	return 6 - countConfirmedPieceCells(4);
 }
 
 function MinFlipsToCompleteCoffer() {
-	var hitCount = 0;
-	for (var i = 0; i < 6; i++) {
-		for (var j = 0; j < 6; j++) {
-			if (window.fhs_grid[i][j] == 3) hitCount++;
-		}
-	}
-	return 4 - hitCount;
+	return 4 - countConfirmedPieceCells(3);
 }
 
 function normalizeWeightInput(id, fallback) {
