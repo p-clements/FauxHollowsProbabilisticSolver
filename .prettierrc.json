@@ -1,0 +1,10 @@
+{
+	"endOfLine": "lf",
+	"htmlWhitespaceSensitivity": "ignore",
+	"printWidth": 120,
+	"proseWrap": "preserve",
+	"singleQuote": false,
+	"tabWidth": 4,
+	"trailingComma": "none",
+	"useTabs": true
+}

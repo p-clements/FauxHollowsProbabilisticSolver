@@ -8,7 +8,8 @@ const fhs_erase_icon_url = "images/erase.png";
 const fhs_prediction_icon_url = "images/prediction.png";
 const fhs_verified_icon_url = "images/verified.png";
 const fhs_sighting_icon_url = "images/sighting.png";
-const fhs_blank_icon_uri = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVR4nGNgAAIAAAUAAXpeqz8AAAAASUVORK5CYII=";
+const fhs_blank_icon_uri =
+	"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVR4nGNgAAIAAAUAAXpeqz8AAAAASUVORK5CYII=";
 
 const fhs_blocked_color = "rgb(140, 140, 140)";
 const fhs_missed_color = "rgb(255, 80, 80)";
@@ -49,137 +50,182 @@ function IndexFormat(index) {
 }
 
 function isFlipState(state) {
-	return state === fhs_missed_state
-		|| state === fhs_chest_state
-		|| state === fhs_swords_state
-		|| state === fhs_fox_state;
+	return (
+		state === fhs_missed_state || state === fhs_chest_state || state === fhs_swords_state || state === fhs_fox_state
+	);
 }
 
 function canBePredictionTarget(state) {
-	return state === fhs_empty_state
-		|| state === fhs_verified_state
-		|| state === fhs_sighting_state
-		|| state === fhs_prediction_state
-		|| state === fhs_prediction_verified_state
-		|| state === fhs_prediction_sighting_state;
+	return (
+		state === fhs_empty_state ||
+		state === fhs_verified_state ||
+		state === fhs_sighting_state ||
+		state === fhs_prediction_state ||
+		state === fhs_prediction_verified_state ||
+		state === fhs_prediction_sighting_state
+	);
 }
 
 const CELL_META = {
 	[fhs_empty_state]: {
-		name: function() { return fhs_empty_name; },
+		name: function () {
+			return fhs_empty_name;
+		},
 		color: fhs_empty_color,
-		icon: function() { return fhs_blank_icon_uri; },
+		icon: function () {
+			return fhs_blank_icon_uri;
+		},
 		diagonalMix: false
 	},
 	[fhs_blocked_state]: {
-		name: function() { return fhs_blocked_name; },
+		name: function () {
+			return fhs_blocked_name;
+		},
 		color: fhs_blocked_color,
-		icon: function() { return fhs_blocked_icon_url; },
+		icon: function () {
+			return fhs_blocked_icon_url;
+		},
 		diagonalMix: false
 	},
 	[fhs_missed_state]: {
-		name: function() { return fhs_missed_name; },
+		name: function () {
+			return fhs_missed_name;
+		},
 		color: fhs_missed_color,
-		icon: function() { return fhs_missed_icon_url; },
+		icon: function () {
+			return fhs_missed_icon_url;
+		},
 		diagonalMix: false
 	},
 	[fhs_chest_state]: {
-		name: function() { return chestOrPresentName(); },
+		name: function () {
+			return chestOrPresentName();
+		},
 		color: fhs_chest_color,
-		icon: function() { return chestOrPresentURL(); },
+		icon: function () {
+			return chestOrPresentURL();
+		},
 		diagonalMix: false
 	},
 	[fhs_swords_state]: {
-		name: function() { return fhs_swords_name; },
+		name: function () {
+			return fhs_swords_name;
+		},
 		color: fhs_swords_color,
-		icon: function() { return fhs_swords_icon_url; },
+		icon: function () {
+			return fhs_swords_icon_url;
+		},
 		diagonalMix: false
 	},
 	[fhs_fox_state]: {
-		name: function() { return fhs_fox_name; },
+		name: function () {
+			return fhs_fox_name;
+		},
 		color: fhs_fox_color,
-		icon: function() { return fhs_fox_icon_url; },
+		icon: function () {
+			return fhs_fox_icon_url;
+		},
 		diagonalMix: false
 	},
 	[fhs_prediction_state]: {
-		name: function() { return fhs_prediction_name; },
+		name: function () {
+			return fhs_prediction_name;
+		},
 		color: fhs_prediction_color,
-		icon: function() { return fhs_prediction_icon_url; },
+		icon: function () {
+			return fhs_prediction_icon_url;
+		},
 		diagonalMix: false
 	},
 	[fhs_verified_state]: {
-		name: function() { return fhs_verified_name; },
+		name: function () {
+			return fhs_verified_name;
+		},
 		color: fhs_verified_color,
-		icon: function() { return fhs_verified_icon_url; },
+		icon: function () {
+			return fhs_verified_icon_url;
+		},
 		diagonalMix: false
 	},
 	[fhs_sighting_state]: {
-		name: function() { return fhs_sighting_name; },
+		name: function () {
+			return fhs_sighting_name;
+		},
 		color: fhs_sighting_color,
-		icon: function() { return fhs_sighting_icon_url; },
+		icon: function () {
+			return fhs_sighting_icon_url;
+		},
 		diagonalMix: false
 	},
 	[fhs_prediction_verified_state]: {
-		name: function() { return fhs_prediction_name + " and " + fhs_verified_name; },
+		name: function () {
+			return fhs_prediction_name + " and " + fhs_verified_name;
+		},
 		color: fhs_verified_color,
-		icon: function() { return fhs_prediction_icon_url; },
+		icon: function () {
+			return fhs_prediction_icon_url;
+		},
 		diagonalMix: true
 	},
 	[fhs_prediction_sighting_state]: {
-		name: function() { return fhs_prediction_name + " and " + fhs_sighting_name; },
+		name: function () {
+			return fhs_prediction_name + " and " + fhs_sighting_name;
+		},
 		color: fhs_sighting_color,
-		icon: function() { return fhs_prediction_icon_url; },
+		icon: function () {
+			return fhs_prediction_icon_url;
+		},
 		diagonalMix: false
 	}
 };
 
 const fhs_sheet_patterns = [
-	[ 8,10,13,26,35],
-	[ 9,13,16,28,30],
-	[ 0, 9,22,25,27],
-	[ 5, 7,19,22,26],
-	[ 3,13,16,21,32],
-	[ 9,12,20,23,27],
-	[ 3,14,19,22,32],
-	[ 8,12,15,23,26],
-	[ 4, 7,15,25,33],
-	[ 7,10,18,21,29],
-	[ 2,10,20,28,31],
-	[ 6,14,17,25,28],
-	[ 7,16,18,27,32],
-	[ 2,10,12,19,27],
-	[ 3, 8,17,19,28],
-	[ 8,16,23,25,33]
+	[8, 10, 13, 26, 35],
+	[9, 13, 16, 28, 30],
+	[0, 9, 22, 25, 27],
+	[5, 7, 19, 22, 26],
+	[3, 13, 16, 21, 32],
+	[9, 12, 20, 23, 27],
+	[3, 14, 19, 22, 32],
+	[8, 12, 15, 23, 26],
+	[4, 7, 15, 25, 33],
+	[7, 10, 18, 21, 29],
+	[2, 10, 20, 28, 31],
+	[6, 14, 17, 25, 28],
+	[7, 16, 18, 27, 32],
+	[2, 10, 12, 19, 27],
+	[3, 8, 17, 19, 28],
+	[8, 16, 23, 25, 33]
 ];
 
-document.addEventListener("keydown", function(event) {
+document.addEventListener("keydown", function (event) {
 	var isEditingWeights = false;
 	var weights = document.querySelectorAll("input[type=number]");
 	var selection = document.activeElement;
-	Array.prototype.forEach.call(weights, function(weight) {
-		if(weight == selection) {
+	Array.prototype.forEach.call(weights, function (weight) {
+		if (weight == selection) {
 			isEditingWeights = true;
 		}
 	});
-	if(!isEditingWeights) {
+	if (!isEditingWeights) {
 		var index = -1;
 		switch (event.key) {
-			case '1':
+			case "1":
 				index = 0;
 				break;
-			case '2':
+			case "2":
 				index = 1;
 				break;
-			case '3':
+			case "3":
 				index = 2;
 				break;
-			case '4':
+			case "4":
 				index = 3;
 				break;
-			case '5':
+			case "5":
 				index = 4;
 				break;
-			case '6':
+			case "6":
 				index = 5;
 				break;
 			default:
@@ -197,11 +243,11 @@ document.addEventListener("keydown", function(event) {
 
 */
 
-document.getElementById("advancedsettings").addEventListener("change", function()   {
+document.getElementById("advancedsettings").addEventListener("change", function () {
 	SaveSettings();
 });
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
 	RestoreSettings();
 });
 
@@ -213,8 +259,8 @@ function SaveSettings() {
 		showstats: document.getElementById("showstats").checked,
 		liveupdate: document.getElementById("liveupdate").checked,
 		gameweek2: document.getElementById("gameweek2").checked,
-		foxweight: document.getElementById("foxweight").value,
-		boxweight: document.getElementById("boxweight").value,
+		foxweight: String(normalizeWeightInput("foxweight", 100)),
+		boxweight: String(normalizeWeightInput("boxweight", isCofferSet() ? 35 : 25)),
 		boxType: document.getElementById("box1").checked ? "coffer" : "present",
 		advancedOpen: !!(collapse && collapse.style.maxHeight)
 	};
@@ -283,15 +329,13 @@ function RestoreSettings() {
 	updateControlsSticky();
 }
 
-
-
 /*
 
 	Begin Collapse and Reset Listeners
 
 */
 
-document.getElementById("menucollapse").addEventListener("click", function() {
+document.getElementById("menucollapse").addEventListener("click", function () {
 	var arrow = document.getElementById("arrow");
 	arrow.classList.toggle("arrow-rotated");
 	var collapse = document.getElementById("collapsebox");
@@ -304,34 +348,34 @@ document.getElementById("menucollapse").addEventListener("click", function() {
 	SaveSettings();
 });
 var collapselabel = document.getElementById("collapselabel");
-collapselabel.addEventListener("mousedown", function() {
+collapselabel.addEventListener("mousedown", function () {
 	var cbutton = document.getElementById("collapselabel");
-	if(!cbutton.classList.contains("advanced-collapse-pressed")) {
+	if (!cbutton.classList.contains("advanced-collapse-pressed")) {
 		cbutton.classList.add("advanced-collapse-pressed");
 	}
 });
 function removeCollapsePressed() {
 	var cbutton = document.getElementById("collapselabel");
-	if(cbutton.classList.contains("advanced-collapse-pressed")) {
+	if (cbutton.classList.contains("advanced-collapse-pressed")) {
 		cbutton.classList.remove("advanced-collapse-pressed");
 	}
 }
 collapselabel.addEventListener("mouseup", removeCollapsePressed);
 collapselabel.addEventListener("mouseleave", removeCollapsePressed);
 
-document.getElementById("resetbutton").addEventListener("click", function() {
+document.getElementById("resetbutton").addEventListener("click", function () {
 	ResetBoard();
 });
 var resetlabel = document.getElementById("resetbuttonlabel");
-resetlabel.addEventListener("mousedown", function() {
+resetlabel.addEventListener("mousedown", function () {
 	var rbutton = document.getElementById("resetbuttonlabel");
-	if(!rbutton.classList.contains("reset-button-pressed")) {
+	if (!rbutton.classList.contains("reset-button-pressed")) {
 		rbutton.classList.add("reset-button-pressed");
 	}
 });
 function removeResetPressed() {
 	var rbutton = document.getElementById("resetbuttonlabel");
-	if(rbutton.classList.contains("reset-button-pressed")) {
+	if (rbutton.classList.contains("reset-button-pressed")) {
 		rbutton.classList.remove("reset-button-pressed");
 	}
 }
@@ -343,7 +387,6 @@ resetlabel.addEventListener("mouseleave", removeResetPressed);
 	End Collapse and Reset Listeners
 
 */
-
 
 /*
 
@@ -369,7 +412,9 @@ function buildBoard() {
 		cell.setAttribute("role", "button");
 		cell.setAttribute("aria-label", "Row " + (Math.floor(i / 6) + 1) + ", column " + ((i % 6) + 1) + ", Empty");
 		cell.innerHTML =
-			'<img src="' + fhs_blank_icon_uri + '" alt="" class="board-cell-icon" draggable="false">' +
+			'<img src="' +
+			fhs_blank_icon_uri +
+			'" alt="" class="board-cell-icon" draggable="false">' +
 			'<span class="board-cell-text"></span>';
 		frag.appendChild(cell);
 	}
@@ -389,13 +434,13 @@ function bindLongPressErase(cell) {
 		}
 	}
 
-	cell.addEventListener("pointerdown", function(e) {
+	cell.addEventListener("pointerdown", function (e) {
 		if (e.pointerType === "mouse" && e.button !== 0) return;
 		moved = false;
 		startX = e.clientX;
 		startY = e.clientY;
 		clearPress();
-		pressTimer = setTimeout(function() {
+		pressTimer = setTimeout(function () {
 			pressTimer = null;
 			if (moved) return;
 			if (cell.getAttribute("data-state") === fhs_empty_state) return;
@@ -403,7 +448,7 @@ function bindLongPressErase(cell) {
 			applyCellMark(cell, "clear", true);
 		}, 450);
 	});
-	cell.addEventListener("pointermove", function(e) {
+	cell.addEventListener("pointermove", function (e) {
 		if (!pressTimer) return;
 		if (Math.abs(e.clientX - startX) > 10 || Math.abs(e.clientY - startY) > 10) {
 			moved = true;
@@ -418,9 +463,9 @@ function bindLongPressErase(cell) {
 buildBoard();
 
 var cells = document.getElementsByClassName("board-cell");
-Array.prototype.forEach.call(cells, function(cell) {
+Array.prototype.forEach.call(cells, function (cell) {
 	cell.addEventListener("click", CellClick);
-	cell.addEventListener("keydown", function(e) {
+	cell.addEventListener("keydown", function (e) {
 		if (e.key === "Enter" || e.key === " ") {
 			e.preventDefault();
 			CellClick.call(cell);
@@ -433,27 +478,27 @@ var lookForFoxCheck = document.getElementById("lookforfox");
 lookForFoxCheck.addEventListener("click", LiveUpdate);
 
 var spreadsheet = document.getElementById("spreadsheet");
-spreadsheet.addEventListener("click", function() {
+spreadsheet.addEventListener("click", function () {
 	ClearSightings();
 	UpdateSightings();
 	SaveSettings();
 });
 
 var weightFeilds = document.querySelectorAll("input[type=number]");
-Array.prototype.forEach.call(weightFeilds, function(weight) {
-	weight.addEventListener("change", function() {
+Array.prototype.forEach.call(weightFeilds, function (weight) {
+	weight.addEventListener("change", function () {
 		LiveUpdate();
 		SaveSettings();
 	});
 });
 
 var gameWeekRadios = document.querySelectorAll("input[type=radio][name=gameweek]");
-Array.prototype.forEach.call(gameWeekRadios, function(radio) {
+Array.prototype.forEach.call(gameWeekRadios, function (radio) {
 	radio.addEventListener("change", applyGameWeekPreset);
 });
 
-document.querySelectorAll('input[name="boxtype"]').forEach(function(radio) {
-	radio.addEventListener("change", function() {
+document.querySelectorAll('input[name="boxtype"]').forEach(function (radio) {
+	radio.addEventListener("change", function () {
 		UpdateCoffer();
 		SaveSettings();
 		LiveUpdate();
@@ -462,14 +507,14 @@ document.querySelectorAll('input[name="boxtype"]').forEach(function(radio) {
 
 var showstatsEl = document.getElementById("showstats");
 if (showstatsEl) {
-	showstatsEl.addEventListener("change", function() {
+	showstatsEl.addEventListener("change", function () {
 		ScoresCheckUpdate();
 		SaveSettings();
 	});
 }
 var liveupdateEl = document.getElementById("liveupdate");
 if (liveupdateEl) {
-	liveupdateEl.addEventListener("change", function() {
+	liveupdateEl.addEventListener("change", function () {
 		LiveUpdate();
 		ScoresCheckUpdate();
 		SaveSettings();
@@ -498,16 +543,38 @@ if (document.fonts && document.fonts.ready) {
 	document.fonts.ready.then(computeHeaderExpandedBottom);
 }
 
-window.addEventListener("scroll", function() {
+function scheduleFrame(callback) {
+	if (window.requestAnimationFrame) {
+		return window.requestAnimationFrame(callback);
+	}
+	return window.setTimeout(callback, 0);
+}
+
+var fhs_header_scroll_frame = null;
+function updateHeaderOnScroll() {
 	var shrink = siteHeader.classList.contains("shrink");
 	var contentTop = contentPane.getBoundingClientRect().top;
-	var shouldShrink = contentTop <= fhs_header_expanded_bottom
-		? true
-		: (contentTop > fhs_header_expanded_bottom + fhs_shrink_band ? false : shrink);
+	var shouldShrink =
+		contentTop <= fhs_header_expanded_bottom
+			? true
+			: contentTop > fhs_header_expanded_bottom + fhs_shrink_band
+				? false
+				: shrink;
 	if (shouldShrink !== shrink) {
 		siteHeader.classList.toggle("shrink", shouldShrink);
 	}
-}, { passive: true });
+}
+window.addEventListener(
+	"scroll",
+	function () {
+		if (fhs_header_scroll_frame !== null) return;
+		fhs_header_scroll_frame = scheduleFrame(function () {
+			fhs_header_scroll_frame = null;
+			updateHeaderOnScroll();
+		});
+	},
+	{ passive: true }
+);
 
 // Bottom-sticky controls are useful only when the full panel fits below the board
 // at rest.  Otherwise leaving the panel in normal flow is safer than allowing a
@@ -545,21 +612,26 @@ if (document.fonts && document.fonts.ready) {
 
 */
 
-
-
 window.fhs_undo = [];
 const fhs_undo_max = 20;
 var fhs_suppress_click = false;
 
 function pickerItemToState(pickedItem) {
 	switch (pickedItem) {
-		case "blocked": return fhs_blocked_state;
-		case "missed": return fhs_missed_state;
-		case "chest": return fhs_chest_state;
-		case "swords": return fhs_swords_state;
-		case "fox": return fhs_fox_state;
-		case "clear": return fhs_empty_state;
-		default: return null;
+		case "blocked":
+			return fhs_blocked_state;
+		case "missed":
+			return fhs_missed_state;
+		case "chest":
+			return fhs_chest_state;
+		case "swords":
+			return fhs_swords_state;
+		case "fox":
+			return fhs_fox_state;
+		case "clear":
+			return fhs_empty_state;
+		default:
+			return null;
 	}
 }
 
@@ -632,7 +704,7 @@ function UndoLast() {
 	LiveUpdate();
 }
 
-document.addEventListener("keydown", function(event) {
+document.addEventListener("keydown", function (event) {
 	var isEditingWeights = document.activeElement && document.activeElement.type === "number";
 	if (isEditingWeights) return;
 	if ((event.ctrlKey || event.metaKey) && (event.key === "z" || event.key === "Z")) {
@@ -651,7 +723,7 @@ function UpdateFlipCounter() {
 
 // Called on MouseEnter and MouseLeave events for each board cell.
 function cellOpacity() {
-	if(this.style.opacity < 1) {
+	if (this.style.opacity < 1) {
 		this.style.opacity = 1;
 	} else {
 		this.style.opacity = 0.9;
@@ -660,7 +732,7 @@ function cellOpacity() {
 
 // Called on MouseEnter and MouseLeave events for the picker radio buttons.
 function radioOpacity() {
-	if(this.style.opacity < 1) {
+	if (this.style.opacity < 1) {
 		this.style.opacity = 1;
 	} else {
 		this.style.opacity = 0.8;
@@ -672,41 +744,41 @@ function getPickerMenuItem() {
 }
 
 function updateTitles() {
-	var cells = document.getElementsByClassName('board-cell');
-	Array.prototype.forEach.call(cells, function(cell) {
-		switch(cell.getAttribute('data-state')) {
+	var cells = document.getElementsByClassName("board-cell");
+	Array.prototype.forEach.call(cells, function (cell) {
+		switch (cell.getAttribute("data-state")) {
 			case fhs_empty_state:
-				cell.setAttribute('title', fhs_empty_name);
+				cell.setAttribute("title", fhs_empty_name);
 				break;
 			case fhs_blocked_state:
-				cell.setAttribute('title', fhs_blocked_name);
+				cell.setAttribute("title", fhs_blocked_name);
 				break;
 			case fhs_missed_state:
-				cell.setAttribute('title', fhs_missed_name);
+				cell.setAttribute("title", fhs_missed_name);
 				break;
 			case fhs_chest_state:
-				cell.setAttribute('title', chestOrPresentName());
+				cell.setAttribute("title", chestOrPresentName());
 				break;
 			case fhs_swords_state:
-				cell.setAttribute('title', fhs_swords_name);
+				cell.setAttribute("title", fhs_swords_name);
 				break;
 			case fhs_fox_state:
-				cell.setAttribute('title', fhs_fox_name);
+				cell.setAttribute("title", fhs_fox_name);
 				break;
 			case fhs_prediction_state:
-				cell.setAttribute('title', fhs_prediction_name);
+				cell.setAttribute("title", fhs_prediction_name);
 				break;
 			case fhs_verified_state:
-				cell.setAttribute('title', fhs_verified_name);
+				cell.setAttribute("title", fhs_verified_name);
 				break;
 			case fhs_sighting_state:
-				cell.setAttribute('title', fhs_sighting_name);
+				cell.setAttribute("title", fhs_sighting_name);
 				break;
 			case fhs_prediction_verified_state:
-				cell.setAttribute('title', fhs_prediction_name + " and " + fhs_verified_name);
+				cell.setAttribute("title", fhs_prediction_name + " and " + fhs_verified_name);
 				break;
 			case fhs_prediction_sighting_state:
-				cell.setAttribute('title', fhs_prediction_name + " and " + fhs_sighting_name);
+				cell.setAttribute("title", fhs_prediction_name + " and " + fhs_sighting_name);
 				break;
 			default:
 				break;
@@ -715,7 +787,7 @@ function updateTitles() {
 }
 
 function UpdateCoffer() {
-	var pickerlabel = document.querySelector("label[for=button3]");
+	var pickerlabel = document.querySelector("label.radiocaption[for=chestradiobutton]");
 	var pickerimg = document.getElementById("button3").children[1];
 	var weightlabel = document.getElementById("boxweightlabel");
 	var weight = document.getElementById("boxweight");
@@ -725,15 +797,15 @@ function UpdateCoffer() {
 	pickerlabel.innerHTML = name;
 	pickerimg.src = url;
 	weightlabel.innerHTML = name;
-	
-	if(isCofferSet()) {
+
+	if (isCofferSet()) {
 		weight.value = 35;
 	} else {
 		weight.value = 25;
 	}
-	
-	var cells = document.getElementsByClassName('board-cell');
-	Array.prototype.forEach.call(cells, function(cell) {
+
+	var cells = document.getElementsByClassName("board-cell");
+	Array.prototype.forEach.call(cells, function (cell) {
 		var state_value = cell.getAttribute("data-state");
 		if (state_value == fhs_chest_state) {
 			// Re-apply all state-derived cell metadata, including aria-label.
@@ -747,7 +819,7 @@ function isCofferSet() {
 }
 
 function chestOrPresentName() {
-	if(isCofferSet()) {
+	if (isCofferSet()) {
 		return fhs_chest_name;
 	} else {
 		return fhs_present_name;
@@ -755,7 +827,7 @@ function chestOrPresentName() {
 }
 
 function chestOrPresentURL() {
-	if(isCofferSet()) {
+	if (isCofferSet()) {
 		return fhs_chest_icon_url;
 	} else {
 		return fhs_present_icon_url;
@@ -784,10 +856,13 @@ function doLiveUpdate() {
 	return document.getElementById("liveupdate").checked;
 }
 
+var fhs_live_update_frame = null;
 function LiveUpdate() {
-	if(doLiveUpdate()) {
-		runGuaranteed();
-	}
+	if (!doLiveUpdate() || fhs_live_update_frame !== null) return;
+	fhs_live_update_frame = scheduleFrame(function () {
+		fhs_live_update_frame = null;
+		if (doLiveUpdate()) runGuaranteed();
+	});
 }
 
 function UpdateCell(cell) {
@@ -812,14 +887,14 @@ function UpdateCell(cell) {
 }
 
 function UpdateGrid() {
-	var cells = document.getElementsByClassName('board-cell');
-	Array.prototype.forEach.call(cells, function(cell) {
+	var cells = document.getElementsByClassName("board-cell");
+	Array.prototype.forEach.call(cells, function (cell) {
 		UpdateCell(cell);
 	});
 }
 
 function ScoresCheckUpdate() {
-	if(QueryShowScores()) {
+	if (QueryShowScores()) {
 		UpdateScoresInCells();
 	} else {
 		ClearAllCellText();
@@ -837,11 +912,15 @@ function UpdateScoresInCells() {
 			var state = cell.getAttribute("data-state");
 			var span = cell.querySelector("span");
 			var next = "";
-			if (canBePredictionTarget(state) || state == fhs_prediction_state ||
+			if (
+				canBePredictionTarget(state) ||
+				state == fhs_prediction_state ||
 				state == fhs_prediction_verified_state ||
 				state == fhs_prediction_sighting_state ||
-				state == fhs_empty_state || state == fhs_verified_state ||
-				state == fhs_sighting_state) {
+				state == fhs_empty_state ||
+				state == fhs_verified_state ||
+				state == fhs_sighting_state
+			) {
 				var v = window.fhs_grid_scores[i][j];
 				if (Number.isFinite(v)) {
 					next = v.toFixed(2);
@@ -856,7 +935,7 @@ function UpdateScoresInCells() {
 
 function ClearAllCellText() {
 	var cells = document.getElementsByClassName("board-cell");
-	Array.prototype.forEach.call(cells, function(cell) {
+	Array.prototype.forEach.call(cells, function (cell) {
 		var span = cell.querySelector("span");
 		if (span) span.textContent = "";
 	});
@@ -868,15 +947,17 @@ function ClearPredictionsAndSightings() {
 			var numStr = IndexFormat(j + 6 * i);
 			var cell = document.getElementById("cell" + numStr);
 			var state = cell.getAttribute("data-state");
-			if (state == fhs_prediction_state ||
+			if (
+				state == fhs_prediction_state ||
 				state == fhs_verified_state ||
 				state == fhs_sighting_state ||
 				state == fhs_prediction_sighting_state ||
-				state == fhs_prediction_verified_state) {
+				state == fhs_prediction_verified_state
+			) {
 				cell.setAttribute("data-state", fhs_empty_state);
 				UpdateCell(cell);
 			}
-		}			
+		}
 	}
 }
 
@@ -886,8 +967,7 @@ function ClearSightings() {
 			var numStr = IndexFormat(j + 6 * i);
 			var cell = document.getElementById("cell" + numStr);
 			var state = cell.getAttribute("data-state");
-			if (state == fhs_verified_state ||
-				state == fhs_sighting_state) {
+			if (state == fhs_verified_state || state == fhs_sighting_state) {
 				cell.setAttribute("data-state", fhs_empty_state);
 				UpdateCell(cell);
 			} else if (state == fhs_prediction_sighting_state) {
@@ -897,7 +977,7 @@ function ClearSightings() {
 				cell.setAttribute("data-state", fhs_prediction_state);
 				UpdateCell(cell);
 			}
-		}			
+		}
 	}
 }
 
@@ -907,7 +987,7 @@ function QueryShowScores() {
 
 function ResetBoard() {
 	var cells = document.getElementsByClassName("board-cell");
-	Array.prototype.forEach.call(cells, function(cell) {
+	Array.prototype.forEach.call(cells, function (cell) {
 		cell.setAttribute("data-state", fhs_empty_state);
 		cell.removeAttribute("data-solver-filled");
 		UpdateCell(cell);
@@ -922,14 +1002,11 @@ function ResetBoard() {
 	if (live) live.textContent = "";
 }
 
-
-
 /*
 
 	Calculation functions and globals
 
 */
-
 
 /*
 	GLOBALS
@@ -950,27 +1027,21 @@ function ParseGrid() {
 	window.fhs_grid = PrefillArray();
 	for (var i = 0; i < 6; i++) {
 		for (var j = 0; j < 6; j++) {
-			
 			var numStr = IndexFormat(j + 6 * i);
 			var cell = document.getElementById("cell" + numStr);
 			var state = cell.getAttribute("data-state");
-			
+
 			if (state == fhs_blocked_state) {
 				window.fhs_grid[i][j] = 1;
-			}
-			else if (state == fhs_missed_state) {
+			} else if (state == fhs_missed_state) {
 				window.fhs_grid[i][j] = 2;
-			}
-			else if (state == fhs_chest_state) {
+			} else if (state == fhs_chest_state) {
 				window.fhs_grid[i][j] = 3;
-			}
-			else if (state == fhs_swords_state) {
+			} else if (state == fhs_swords_state) {
 				window.fhs_grid[i][j] = 4;
-			}
-			else if (state == fhs_fox_state) {
+			} else if (state == fhs_fox_state) {
 				window.fhs_grid[i][j] = 5;
-			}
-			else {
+			} else {
 				// Empty, Verified, Sighting, and Prediction states
 				window.fhs_grid[i][j] = 0;
 			}
@@ -996,9 +1067,9 @@ function UpdatePrediction() {
 		for (var j = 0; j < 6; j++) {
 			var numStr = IndexFormat(j + 6 * i);
 			var cell = document.getElementById("cell" + numStr);
-			
+
 			var state = cell.getAttribute("data-state");
-			
+
 			if (state == fhs_prediction_state) {
 				cell.setAttribute("data-state", fhs_empty_state);
 				UpdateCell(cell);
@@ -1011,9 +1082,7 @@ function UpdatePrediction() {
 				cell.setAttribute("data-state", fhs_sighting_state);
 				UpdateCell(cell);
 				maxScore = Math.max(fhs_grid_scores[i][j], maxScore);
-			} else if (state == fhs_empty_state ||
-					   state == fhs_verified_state ||
-					   state == fhs_sighting_state) {
+			} else if (state == fhs_empty_state || state == fhs_verified_state || state == fhs_sighting_state) {
 				maxScore = Math.max(fhs_grid_scores[i][j], maxScore);
 			}
 		}
@@ -1045,7 +1114,7 @@ function UpdatePrediction() {
 	var live = document.getElementById("prediction-live");
 	if (live) {
 		if (suggested.length) {
-			var parts = suggested.map(function(p) {
+			var parts = suggested.map(function (p) {
 				return "row " + (p[0] + 1) + ", column " + (p[1] + 1);
 			});
 			live.textContent = "Suggested flip: " + parts.join("; ");
@@ -1059,16 +1128,15 @@ function UpdateSightings() {
 	if (!doFoxSightings()) {
 		return;
 	}
-	
+
 	var type = IdentifyPattern();
-	
+
 	if (type != -1) {
 		var verifiedGrid = PrefillArray();
 		var sightingGrid = PrefillArray();
 		fhs_sheet_fox[type].forEach((board) => {
 			var match = true;
-outerloop:
-			for (var i = 0; i < 6; i++) {
+			outerloop: for (var i = 0; i < 6; i++) {
 				for (var j = 0; j < 6; j++) {
 					if (window.fhs_grid[i][j] == 2) {
 						if (board[i][j] != 0 && board[i][j] != 4 && board[i][j] != 5) {
@@ -1089,7 +1157,6 @@ outerloop:
 						// Fox already in grid, no need for any further processing
 						return;
 					}
-					
 				}
 			}
 			if (match) {
@@ -1159,12 +1226,11 @@ function IdentifyPattern() {
 	if (positions.length !== 5) {
 		return -1;
 	}
-	var exists = fhs_sheet_patterns.some(row => JSON.stringify(row) === JSON.stringify(positions));
+	var exists = fhs_sheet_patterns.some((row) => JSON.stringify(row) === JSON.stringify(positions));
 	if (exists) {
 		var match = true;
 		for (var i = 0; i < fhs_sheet_patterns.length; i++) {
-innerloop:
-			for (var j = 0; j < 5; j++) {
+			innerloop: for (var j = 0; j < 5; j++) {
 				if (positions[j] == fhs_sheet_patterns[i][j]) {
 					match = true;
 				} else {
@@ -1181,7 +1247,6 @@ innerloop:
 }
 
 function MarkGuaranteedBlocks() {
-	
 	var medMap = NaiiveMedProb();
 	for (var i = 0; i < 6; i++) {
 		for (var j = 0; j < 6; j++) {
@@ -1210,13 +1275,12 @@ function MarkGuaranteedBlocks() {
 			}
 		}
 	}
-	
 }
 
 function runGuaranteed() {
 	ParseGrid();
 
-	for(var i = 0; i < 2; i++) {
+	for (var i = 0; i < 2; i++) {
 		MarkGuaranteedBlocks();
 	}
 
@@ -1229,7 +1293,6 @@ function runGuaranteed() {
 	UpdatePrediction();
 	UpdateSightings();
 }
-
 
 function GetFlipsRemaining() {
 	return fhs_flip_budget - window.fhs_flips_used;
@@ -1258,29 +1321,45 @@ function MinFlipsToCompleteCoffer() {
 	return 4 - hitCount;
 }
 
+function normalizeWeightInput(id, fallback) {
+	var input = document.getElementById(id);
+	if (!input) return fallback;
+	var value = input.value.trim() === "" ? fallback : Number(input.value);
+	if (!Number.isFinite(value)) value = fallback;
+	value = Math.min(100, Math.max(0, value));
+	input.value = String(value);
+	return value;
+}
+
 // A shape that can't be completed with the flips left is worth 0: zeroing its
 // weight here lets weightedScores/weightedWFScores reallocate to reachable targets.
 function GetChestWeight() {
-	var base = Number(document.getElementById("boxweight").value);
+	var base = normalizeWeightInput("boxweight", isCofferSet() ? 35 : 25);
 	return MinFlipsToCompleteCoffer() > GetFlipsRemaining() ? 0 : base;
 }
 
 function GetSwordsWeight() {
-	var base = Number(document.getElementById("swordweight").value);
+	var base = normalizeWeightInput(
+		"swordweight",
+		document.getElementById("gameweek1").checked ? fhs_sword_weight_hunting_retelling : fhs_sword_weight_raw
+	);
 	return MinFlipsToCompleteSwords() > GetFlipsRemaining() ? 0 : base;
 }
 
 function GetFoxWeight() {
-	return Number(document.getElementById("foxweight").value);
+	return normalizeWeightInput("foxweight", 100);
 }
 
 function weightedScores(probs) {
 	var newScores = PrefillArray();
+	var foxWeight = GetFoxWeight();
+	var boxWeight = GetChestWeight();
+	var swordsWeight = GetSwordsWeight();
 	for (var i = 0; i < 6; i++) {
 		for (var j = 0; j < 6; j++) {
-			var foxWeighted = probs[0][i][j] * GetFoxWeight();
-			var boxWeighted = probs[1][i][j] * GetChestWeight();
-			var swordsWeighted = probs[2][i][j] * GetSwordsWeight();
+			var foxWeighted = probs[0][i][j] * foxWeight;
+			var boxWeighted = probs[1][i][j] * boxWeight;
+			var swordsWeighted = probs[2][i][j] * swordsWeight;
 			newScores[i][j] = foxWeighted + boxWeighted + swordsWeighted;
 		}
 	}
@@ -1289,10 +1368,12 @@ function weightedScores(probs) {
 
 function weightedWFScores(probs) {
 	var newScores = PrefillArray();
+	var boxWeight = GetChestWeight();
+	var swordsWeight = GetSwordsWeight();
 	for (var i = 0; i < 6; i++) {
 		for (var j = 0; j < 6; j++) {
-			var boxWeighted = probs[0][i][j] * GetChestWeight();
-			var swordsWeighted = probs[1][i][j] * GetSwordsWeight();
+			var boxWeighted = probs[0][i][j] * boxWeight;
+			var swordsWeighted = probs[1][i][j] * swordsWeight;
 			newScores[i][j] = boxWeighted + swordsWeighted;
 		}
 	}
@@ -1321,8 +1402,7 @@ function NaiiveLargeProb() {
 		//Horizontals
 		for (var i = 0; i < 2; i++) {
 			for (var j = 0; j < 3; j++) {
-				if (hitLoc[0] - (1 - i) < 0 || hitLoc[0] + i > 5 ||
-					hitLoc[1] - (2 - j) < 0 || hitLoc[1] + j > 5) {
+				if (hitLoc[0] - (1 - i) < 0 || hitLoc[0] + i > 5 || hitLoc[1] - (2 - j) < 0 || hitLoc[1] + j > 5) {
 					continue;
 				}
 				var coords = [
@@ -1365,8 +1445,7 @@ function NaiiveLargeProb() {
 		//Verticals
 		for (var i = 0; i < 3; i++) {
 			for (var j = 0; j < 2; j++) {
-				if (hitLoc[0] - (2 - i) < 0 || hitLoc[0] + i > 5 ||
-					hitLoc[1] - (1 - j) < 0 || hitLoc[1] + j > 5) {
+				if (hitLoc[0] - (2 - i) < 0 || hitLoc[0] + i > 5 || hitLoc[1] - (1 - j) < 0 || hitLoc[1] + j > 5) {
 					continue;
 				}
 				var coords = [
@@ -1417,7 +1496,7 @@ function NaiiveLargeProb() {
 
 		return hitMap;
 	}
-	
+
 	//Horizontal
 	for (var i = 0; i < 5; i++) {
 		for (var j = 0; j < 4; j++) {
@@ -1427,12 +1506,7 @@ function NaiiveLargeProb() {
 			var block4 = window.fhs_grid[i + 1][j];
 			var block5 = window.fhs_grid[i + 1][j + 1];
 			var block6 = window.fhs_grid[i + 1][j + 2];
-			if (block1 != 0 ||
-				block2 != 0 ||
-				block3 != 0 ||
-				block4 != 0 ||
-				block5 != 0 ||
-				block6 != 0) {
+			if (block1 != 0 || block2 != 0 || block3 != 0 || block4 != 0 || block5 != 0 || block6 != 0) {
 				continue;
 			} else {
 				hitMap[i][j]++;
@@ -1443,7 +1517,6 @@ function NaiiveLargeProb() {
 				hitMap[i + 1][j + 2]++;
 				probCount++;
 			}
-
 		}
 	}
 
@@ -1456,12 +1529,7 @@ function NaiiveLargeProb() {
 			var block4 = window.fhs_grid[i + 1][j + 1];
 			var block5 = window.fhs_grid[i + 2][j];
 			var block6 = window.fhs_grid[i + 2][j + 1];
-			if (block1 != 0 ||
-				block2 != 0 ||
-				block3 != 0 ||
-				block4 != 0 ||
-				block5 != 0 ||
-				block6 != 0) {
+			if (block1 != 0 || block2 != 0 || block3 != 0 || block4 != 0 || block5 != 0 || block6 != 0) {
 				continue;
 			} else {
 				hitMap[i][j]++;
@@ -1474,7 +1542,7 @@ function NaiiveLargeProb() {
 			}
 		}
 	}
-	
+
 	if (probCount === 0) {
 		return PrefillArray();
 	}
@@ -1506,8 +1574,7 @@ function NaiiveMedProb() {
 	if (hitCount > 0) {
 		for (var i = -1; i < 1; i++) {
 			for (var j = -1; j < 1; j++) {
-				if (hitLoc[0] + i < 0 || hitLoc[0] + 1 + i > 5 ||
-					hitLoc[1] + j < 0 || hitLoc[1] + 1 + j > 5) {
+				if (hitLoc[0] + i < 0 || hitLoc[0] + 1 + i > 5 || hitLoc[1] + j < 0 || hitLoc[1] + 1 + j > 5) {
 					continue;
 				}
 				var coords = [
@@ -1537,8 +1604,12 @@ function NaiiveMedProb() {
 	} else {
 		for (var i = 0; i < 5; i++) {
 			for (var j = 0; j < 5; j++) {
-				if (window.fhs_grid[i][j] != 0 || window.fhs_grid[i][j + 1] != 0 ||
-					window.fhs_grid[i + 1][j] != 0 || window.fhs_grid[i + 1][j + 1] != 0) {
+				if (
+					window.fhs_grid[i][j] != 0 ||
+					window.fhs_grid[i][j + 1] != 0 ||
+					window.fhs_grid[i + 1][j] != 0 ||
+					window.fhs_grid[i + 1][j + 1] != 0
+				) {
 					continue;
 				} else {
 					count++;
@@ -1564,11 +1635,7 @@ function NaiiveMedProb() {
 
 function CalculateFullProb() {
 	// 6x6x3 array zero filled
-	var hitMap = new Array(6).fill(0).map(
-		() => new Array(6).fill(0).map(
-			() => new Array(3).fill(0)
-		)
-	);
+	var hitMap = new Array(6).fill(0).map(() => new Array(6).fill(0).map(() => new Array(3).fill(0)));
 	var hitCount = 0;
 	var currentHits = [0, 0, 0];
 
@@ -1602,17 +1669,16 @@ function CalculateFullProb() {
 	*/
 	for (var iSm = 0; iSm < 6; iSm++) {
 		for (var jSm = 0; jSm < 6; jSm++) {
-			if ((window.fhs_grid[iSm][jSm] == 0 && currentHits[0] == 0) ||
-				(window.fhs_grid[iSm][jSm] == 5 && currentHits[0] != 0)) {
-
+			if (
+				(window.fhs_grid[iSm][jSm] == 0 && currentHits[0] == 0) ||
+				(window.fhs_grid[iSm][jSm] == 5 && currentHits[0] != 0)
+			) {
 				// Deep copy
 				var gridSmallAdded = JSON.parse(JSON.stringify(window.fhs_grid));
 				gridSmallAdded[iSm][jSm] = 5;
 
-
 				for (var iMed = 0; iMed < 5; iMed++) {
 					for (var jMed = 0; jMed < 5; jMed++) {
-
 						var medBlocks = [
 							gridSmallAdded[iMed][jMed],
 							gridSmallAdded[iMed][jMed + 1],
@@ -1627,22 +1693,22 @@ function CalculateFullProb() {
 							}
 						}
 
-						if (medTotalInPlacement == currentHits[1] &&
+						if (
+							medTotalInPlacement == currentHits[1] &&
 							(medBlocks[0] == 0 || medBlocks[0] == 3) &&
 							(medBlocks[1] == 0 || medBlocks[1] == 3) &&
 							(medBlocks[2] == 0 || medBlocks[2] == 3) &&
-							(medBlocks[3] == 0 || medBlocks[3] == 3)) {
-
+							(medBlocks[3] == 0 || medBlocks[3] == 3)
+						) {
 							var gridMedAdded = JSON.parse(JSON.stringify(gridSmallAdded));
 							gridMedAdded[iMed][jMed] = 3;
 							gridMedAdded[iMed][jMed + 1] = 3;
 							gridMedAdded[iMed + 1][jMed] = 3;
 							gridMedAdded[iMed + 1][jMed + 1] = 3;
-							
+
 							//Horizontal Larges
 							for (var iLg = 0; iLg < 5; iLg++) {
 								for (var jLg = 0; jLg < 4; jLg++) {
-
 									var largeBlocks = [
 										gridMedAdded[iLg][jLg],
 										gridMedAdded[iLg][jLg + 1],
@@ -1659,14 +1725,15 @@ function CalculateFullProb() {
 										}
 									}
 
-									if (largeTotalInPlacement == currentHits[2] &&
+									if (
+										largeTotalInPlacement == currentHits[2] &&
 										(largeBlocks[0] == 0 || largeBlocks[0] == 4) &&
 										(largeBlocks[1] == 0 || largeBlocks[1] == 4) &&
 										(largeBlocks[2] == 0 || largeBlocks[2] == 4) &&
 										(largeBlocks[3] == 0 || largeBlocks[3] == 4) &&
 										(largeBlocks[4] == 0 || largeBlocks[4] == 4) &&
-										(largeBlocks[5] == 0 || largeBlocks[5] == 4)) {
-
+										(largeBlocks[5] == 0 || largeBlocks[5] == 4)
+									) {
 										hitMap[iSm][jSm][0]++;
 
 										hitMap[iMed][jMed][1]++;
@@ -1689,9 +1756,8 @@ function CalculateFullProb() {
 							//Vertical Larges
 							for (var iLg = 0; iLg < 4; iLg++) {
 								for (var jLg = 0; jLg < 5; jLg++) {
-									
 									var largeBlocks = [
-									gridMedAdded[iLg][jLg],
+										gridMedAdded[iLg][jLg],
 										gridMedAdded[iLg][jLg + 1],
 										gridMedAdded[iLg + 1][jLg],
 										gridMedAdded[iLg + 1][jLg + 1],
@@ -1706,14 +1772,15 @@ function CalculateFullProb() {
 										}
 									}
 
-									if (largeTotalInPlacement == currentHits[2] &&
+									if (
+										largeTotalInPlacement == currentHits[2] &&
 										(largeBlocks[0] == 0 || largeBlocks[0] == 4) &&
 										(largeBlocks[1] == 0 || largeBlocks[1] == 4) &&
 										(largeBlocks[2] == 0 || largeBlocks[2] == 4) &&
 										(largeBlocks[3] == 0 || largeBlocks[3] == 4) &&
 										(largeBlocks[4] == 0 || largeBlocks[4] == 4) &&
-										(largeBlocks[5] == 0 || largeBlocks[5] == 4)) {
-	
+										(largeBlocks[5] == 0 || largeBlocks[5] == 4)
+									) {
 										hitMap[iSm][jSm][0]++;
 
 										hitMap[iMed][jMed][1]++;
@@ -1743,11 +1810,7 @@ function CalculateFullProb() {
 
 	//LARGE HIT COUNT IS THE SAME AS TOTAL BOARD CONFIGS
 	//Formula: number of hits/total board configs
-	var probabilityMaps = [
-		PrefillArray(),
-		PrefillArray(),
-		PrefillArray()
-	];
+	var probabilityMaps = [PrefillArray(), PrefillArray(), PrefillArray()];
 
 	if (hitCount === 0) {
 		return probabilityMaps;
@@ -1767,11 +1830,7 @@ function CalculateFullProb() {
 // Doesn't add Fox to calculation.
 function CalculateProbWithoutFox() {
 	// 6x6x3 array zero filled
-	var hitMap = new Array(6).fill(0).map(
-		() => new Array(6).fill(0).map(
-			() => new Array(2).fill(0)
-		)
-	);
+	var hitMap = new Array(6).fill(0).map(() => new Array(6).fill(0).map(() => new Array(2).fill(0)));
 	var hitCount = 0;
 	var currentHits = [0, 0];
 
@@ -1785,10 +1844,9 @@ function CalculateProbWithoutFox() {
 			}
 		}
 	}
-	
+
 	for (var iMed = 0; iMed < 5; iMed++) {
 		for (var jMed = 0; jMed < 5; jMed++) {
-
 			var medBlocks = [
 				window.fhs_grid[iMed][jMed],
 				window.fhs_grid[iMed][jMed + 1],
@@ -1803,22 +1861,22 @@ function CalculateProbWithoutFox() {
 				}
 			}
 
-			if (medTotalInPlacement == currentHits[0] &&
-			   (medBlocks[0] == 0 || medBlocks[0] == 3) &&
-			   (medBlocks[1] == 0 || medBlocks[1] == 3) &&
-			   (medBlocks[2] == 0 || medBlocks[2] == 3) &&
-			   (medBlocks[3] == 0 || medBlocks[3] == 3)) {
-
+			if (
+				medTotalInPlacement == currentHits[0] &&
+				(medBlocks[0] == 0 || medBlocks[0] == 3) &&
+				(medBlocks[1] == 0 || medBlocks[1] == 3) &&
+				(medBlocks[2] == 0 || medBlocks[2] == 3) &&
+				(medBlocks[3] == 0 || medBlocks[3] == 3)
+			) {
 				var gridMedAdded = JSON.parse(JSON.stringify(window.fhs_grid));
 				gridMedAdded[iMed][jMed] = 3;
 				gridMedAdded[iMed][jMed + 1] = 3;
 				gridMedAdded[iMed + 1][jMed] = 3;
 				gridMedAdded[iMed + 1][jMed + 1] = 3;
-				
+
 				//Horizontal Larges
 				for (var iLg = 0; iLg < 5; iLg++) {
 					for (var jLg = 0; jLg < 4; jLg++) {
-
 						var largeBlocks = [
 							gridMedAdded[iLg][jLg],
 							gridMedAdded[iLg][jLg + 1],
@@ -1835,14 +1893,15 @@ function CalculateProbWithoutFox() {
 							}
 						}
 
-						if (largeTotalInPlacement == currentHits[1] &&
-						   (largeBlocks[0] == 0 || largeBlocks[0] == 4) &&
-						   (largeBlocks[1] == 0 || largeBlocks[1] == 4) &&
-						   (largeBlocks[2] == 0 || largeBlocks[2] == 4) &&
-						   (largeBlocks[3] == 0 || largeBlocks[3] == 4) &&
-						   (largeBlocks[4] == 0 || largeBlocks[4] == 4) &&
-						   (largeBlocks[5] == 0 || largeBlocks[5] == 4)) {
-
+						if (
+							largeTotalInPlacement == currentHits[1] &&
+							(largeBlocks[0] == 0 || largeBlocks[0] == 4) &&
+							(largeBlocks[1] == 0 || largeBlocks[1] == 4) &&
+							(largeBlocks[2] == 0 || largeBlocks[2] == 4) &&
+							(largeBlocks[3] == 0 || largeBlocks[3] == 4) &&
+							(largeBlocks[4] == 0 || largeBlocks[4] == 4) &&
+							(largeBlocks[5] == 0 || largeBlocks[5] == 4)
+						) {
 							hitMap[iMed][jMed][0]++;
 							hitMap[iMed][jMed + 1][0]++;
 							hitMap[iMed + 1][jMed][0]++;
@@ -1857,12 +1916,11 @@ function CalculateProbWithoutFox() {
 							hitCount++;
 						}
 					}
-				}// End Horizontal Larges
+				} // End Horizontal Larges
 
 				//Vertical Larges
 				for (var iLg = 0; iLg < 4; iLg++) {
 					for (var jLg = 0; jLg < 5; jLg++) {
-
 						var largeBlocks = [
 							gridMedAdded[iLg][jLg],
 							gridMedAdded[iLg][jLg + 1],
@@ -1879,14 +1937,15 @@ function CalculateProbWithoutFox() {
 							}
 						}
 
-						if (largeTotalInPlacement == currentHits[1] &&
-						   (largeBlocks[0] == 0 || largeBlocks[0] == 4) &&
-						   (largeBlocks[1] == 0 || largeBlocks[1] == 4) &&
-						   (largeBlocks[2] == 0 || largeBlocks[2] == 4) &&
-						   (largeBlocks[3] == 0 || largeBlocks[3] == 4) &&
-						   (largeBlocks[4] == 0 || largeBlocks[4] == 4) &&
-						   (largeBlocks[5] == 0 || largeBlocks[5] == 4)) {
-	
+						if (
+							largeTotalInPlacement == currentHits[1] &&
+							(largeBlocks[0] == 0 || largeBlocks[0] == 4) &&
+							(largeBlocks[1] == 0 || largeBlocks[1] == 4) &&
+							(largeBlocks[2] == 0 || largeBlocks[2] == 4) &&
+							(largeBlocks[3] == 0 || largeBlocks[3] == 4) &&
+							(largeBlocks[4] == 0 || largeBlocks[4] == 4) &&
+							(largeBlocks[5] == 0 || largeBlocks[5] == 4)
+						) {
 							hitMap[iMed][jMed][0]++;
 							hitMap[iMed][jMed + 1][0]++;
 							hitMap[iMed + 1][jMed][0]++;
@@ -1901,7 +1960,7 @@ function CalculateProbWithoutFox() {
 							hitCount++;
 						}
 					}
-				}// End Vertical Larges
+				} // End Vertical Larges
 			}
 		}
 	} // End Mediums
@@ -1910,10 +1969,7 @@ function CalculateProbWithoutFox() {
 
 	//LARGE HIT COUNT IS THE SAME AS TOTAL BOARD CONFIGS
 	//Formula: number of hits/total board configs
-	var probabilityMaps = [
-		PrefillArray(),
-		PrefillArray()
-	];
+	var probabilityMaps = [PrefillArray(), PrefillArray()];
 
 	if (hitCount === 0) {
 		return probabilityMaps;
@@ -1927,8 +1983,6 @@ function CalculateProbWithoutFox() {
 
 	return probabilityMaps;
 }
-
-
 
 /*
 

@@ -1,194 +1,318 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en-US">
+	<head>
+		<!--Site written by Fyrin Niyuun @ Behemoth. Formerly Fyrin Niyuun @ Faerie-->
+		<title>Faux Hollows Solver</title>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover" />
+		<meta name="theme-color" content="#0b0e14" />
+		<link rel="manifest" href="manifest.json" />
+		<!-- asset-version: 20 -->
+		<link rel="stylesheet" type="text/css" href="style.css?v=20" />
+		<link rel="shortcut icon" href="images/logo.png" type="image/png" />
+		<link rel="apple-touch-icon" href="images/apple-touch-icon.png" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+		<meta name="apple-mobile-web-app-title" content="Faux Hollows" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Roboto:wght@300&display=swap"
+			rel="stylesheet"
+		/>
+		<script type="text/javascript" src="data.js"></script>
+	</head>
 
-<head>
-	<!--Site written by Fyrin Niyuun @ Behemoth. Formerly Fyrin Niyuun @ Faerie-->
-	<title>Faux Hollows Solver</title>
-	<meta charset="UTF-8" />
-	<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
-	<meta name="theme-color" content="#0b0e14">
-	<link rel="manifest" href="manifest.json">
-	<!-- asset-version: 19 -->
-	<link rel="stylesheet" type="text/css" href="style.css?v=19">
-	<link rel="shortcut icon" href="images/logo.png" type="image/png">
-	<link rel="apple-touch-icon" href="images/apple-touch-icon.png">
-	<meta name="apple-mobile-web-app-capable" content="yes">
-	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-	<meta name="apple-mobile-web-app-title" content="Faux Hollows">
-	<link rel="preconnect" href="https://fonts.googleapis.com">
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Roboto:wght@300&display=swap" rel="stylesheet">
-	<script type="text/javascript" src="data.js"></script>
-</head>
-
-<body>
-	<div id="app">
-		<div id="main">
-			<header id="site-header" class="dp-high rounded about-header site-header noselect">
-				<h1>Faux Hollows Solver</h1>
-				<img src="images/fox.png" class="about-fox-watermark" alt="" aria-hidden="true">
-			</header>
-			<div id="content" class="contentpane dp-low rounded">
-				<div id="board" class="board" aria-label="Faux Hollows board"></div>
-				<div id="prediction-live" class="sr-only" aria-live="polite" aria-atomic="true"></div>
-				<div class="h-separator"></div>
-				<div class="dp-high rounded controls controls-sticky">
-					<div class="game-toggle noselect" role="radiogroup" aria-label="Game version">
-						<label class="game-toggle-option">
-							<input type="radio" id="gameweek1" name="gameweek" value="game1" checked>
-							<span class="game-toggle-caption">First Retelling</span>
-						</label>
-						<label class="game-toggle-option">
-							<input type="radio" id="gameweek2" name="gameweek" value="game2">
-							<span class="game-toggle-caption">Second Retelling</span>
-						</label>
-					</div>
+	<body>
+		<div id="app">
+			<div id="main">
+				<header id="site-header" class="dp-high rounded about-header site-header noselect">
+					<h1>Faux Hollows Solver</h1>
+					<img src="images/fox.png" class="about-fox-watermark" alt="" aria-hidden="true" />
+				</header>
+				<div id="content" class="contentpane dp-low rounded">
+					<div id="board" class="board" aria-label="Faux Hollows board"></div>
+					<div id="prediction-live" class="sr-only" aria-live="polite" aria-atomic="true"></div>
 					<div class="h-separator"></div>
-					<form action id="picker" role="radiogroup" aria-label="Mark cell as">
-						<div class="radiocontainer noselect">
-							<label id="button1" for="blockedradiobutton" class="radiobuttonlabel optransition" title="Blocked">
-								<input type="radio" id="blockedradiobutton" name="pickeritem" value="blocked" checked>
-								<img src="images/blocked.png" class="radioimage" draggable="false" ondragstart="return false;"/>
+					<div class="dp-high rounded controls controls-sticky">
+						<div class="game-toggle noselect" role="radiogroup" aria-label="Game version">
+							<label class="game-toggle-option">
+								<input type="radio" id="gameweek1" name="gameweek" value="game1" checked />
+								<span class="game-toggle-caption">First Retelling</span>
 							</label>
-							<label for="button1" class="radiocaption">Blocked</label>
-						</div>
-						<div class="radiocontainer radiospace noselect">
-							<label id="button2" for="missedradiobutton" class="radiobuttonlabel optransition" title="Missed">
-								<input type="radio" id="missedradiobutton" name="pickeritem" value="missed">
-								<img src="images/missed.png" class="radioimage" draggable="false" ondragstart="return false;"/>
+							<label class="game-toggle-option">
+								<input type="radio" id="gameweek2" name="gameweek" value="game2" />
+								<span class="game-toggle-caption">Second Retelling</span>
 							</label>
-							<label for="button2" class="radiocaption">Missed</label>
 						</div>
-						<div class="radiocontainer radiospace noselect">
-							<label id="button3" for="chestradiobutton" class="radiobuttonlabel optransition" title="Chest">
-								<input type="radio" id="chestradiobutton" name="pickeritem" value="chest">
-								<img src="images/chest.png" class="radioimage" draggable="false" ondragstart="return false;"/>
-							</label>
-							<label for="button3" class="radiocaption">Coffer</label>
-						</div>
-						<div class="radiocontainer radiospace noselect">
-							<label id="button4" for="swordsradiobutton" class="radiobuttonlabel optransition" title="Swords">
-								<input type="radio" id="swordsradiobutton" name="pickeritem" value="swords">
-								<img src="images/swords.png" class="radioimage" draggable="false" ondragstart="return false;"/>
-							</label>
-							<label for="button4" class="radiocaption">Swords</label>
-						</div>
-						<div class="radiocontainer radiospace noselect">
-							<label id="button5" for="foxradiobutton" class="radiobuttonlabel optransition" title="Fox">
-								<input type="radio" id="foxradiobutton" name="pickeritem" value="fox">
-								<img src="images/fox.png" class="radioimage" draggable="false" ondragstart="return false;"/>
-							</label>
-							<label for="button5" class="radiocaption">Fox</label>
-						</div>
-						<div class="radiocontainer radiospace noselect">
-							<label id="button6" for="clearradiobutton" class="radiobuttonlabel optransition" title="Erase">
-								<input type="radio" id="clearradiobutton" name="pickeritem" value="clear">
-								<img src="images/erase.png" class="radioimage" draggable="false" ondragstart="return false;"/>
-							</label>
-							<label for="button6" class="radiocaption">Erase</label>
-						</div>
-					</form>
-					<div class="h-separator"></div>
-					<div class="button-row">
-						<label for="menucollapse" id="collapselabel" class="advanced-collapse-label noselect">
-							<input id="menucollapse" type="button" />
-							Advanced
-							<div id="arrow" class="arrow"></div>
-						</label>
-						<span id="flipcounter" class="flip-counter noselect">Flips: 0 / 11</span>
-						<label for="undobutton" id="undobuttonlabel" class="undo-button-label noselect">
-							<input id="undobutton" type="button" />
-							Undo
-						</label>
-						<label for="resetbutton" id="resetbuttonlabel" class="reset-button-label noselect">
-							<input id="resetbutton" type="button" />
-							Reset
-						</label>
-					</div>
-					<div id="collapsebox" class="collapse-box">
 						<div class="h-separator"></div>
-						<div id="advancedsettings" class="advanced-settings-box">
-							<div class="settings-grid">
-								<div class="settings-group">
-									<h4>Strategy</h4>
-									<div class="option-row">
-										<input type="checkbox" id="spreadsheet" checked>
-										<label for="spreadsheet">Show Fox Sightings</label>
+						<form action id="picker" role="radiogroup" aria-label="Mark cell as">
+							<div class="radiocontainer noselect">
+								<label
+									id="button1"
+									for="blockedradiobutton"
+									class="radiobuttonlabel optransition"
+									title="Blocked"
+								>
+									<input
+										type="radio"
+										id="blockedradiobutton"
+										name="pickeritem"
+										value="blocked"
+										checked
+									/>
+									<img
+										src="images/blocked.png"
+										class="radioimage"
+										draggable="false"
+										ondragstart="return false;"
+									/>
+								</label>
+								<label for="blockedradiobutton" class="radiocaption">Blocked</label>
+							</div>
+							<div class="radiocontainer radiospace noselect">
+								<label
+									id="button2"
+									for="missedradiobutton"
+									class="radiobuttonlabel optransition"
+									title="Missed"
+								>
+									<input type="radio" id="missedradiobutton" name="pickeritem" value="missed" />
+									<img
+										src="images/missed.png"
+										class="radioimage"
+										draggable="false"
+										ondragstart="return false;"
+									/>
+								</label>
+								<label for="missedradiobutton" class="radiocaption">Missed</label>
+							</div>
+							<div class="radiocontainer radiospace noselect">
+								<label
+									id="button3"
+									for="chestradiobutton"
+									class="radiobuttonlabel optransition"
+									title="Chest"
+								>
+									<input type="radio" id="chestradiobutton" name="pickeritem" value="chest" />
+									<img
+										src="images/chest.png"
+										class="radioimage"
+										draggable="false"
+										ondragstart="return false;"
+									/>
+								</label>
+								<label for="chestradiobutton" class="radiocaption">Coffer</label>
+							</div>
+							<div class="radiocontainer radiospace noselect">
+								<label
+									id="button4"
+									for="swordsradiobutton"
+									class="radiobuttonlabel optransition"
+									title="Swords"
+								>
+									<input type="radio" id="swordsradiobutton" name="pickeritem" value="swords" />
+									<img
+										src="images/swords.png"
+										class="radioimage"
+										draggable="false"
+										ondragstart="return false;"
+									/>
+								</label>
+								<label for="swordsradiobutton" class="radiocaption">Swords</label>
+							</div>
+							<div class="radiocontainer radiospace noselect">
+								<label
+									id="button5"
+									for="foxradiobutton"
+									class="radiobuttonlabel optransition"
+									title="Fox"
+								>
+									<input type="radio" id="foxradiobutton" name="pickeritem" value="fox" />
+									<img
+										src="images/fox.png"
+										class="radioimage"
+										draggable="false"
+										ondragstart="return false;"
+									/>
+								</label>
+								<label for="foxradiobutton" class="radiocaption">Fox</label>
+							</div>
+							<div class="radiocontainer radiospace noselect">
+								<label
+									id="button6"
+									for="clearradiobutton"
+									class="radiobuttonlabel optransition"
+									title="Erase"
+								>
+									<input type="radio" id="clearradiobutton" name="pickeritem" value="clear" />
+									<img
+										src="images/erase.png"
+										class="radioimage"
+										draggable="false"
+										ondragstart="return false;"
+									/>
+								</label>
+								<label for="clearradiobutton" class="radiocaption">Erase</label>
+							</div>
+						</form>
+						<div class="h-separator"></div>
+						<div class="button-row">
+							<label for="menucollapse" id="collapselabel" class="advanced-collapse-label noselect">
+								<input id="menucollapse" type="button" />
+								Advanced
+								<div id="arrow" class="arrow"></div>
+							</label>
+							<span id="flipcounter" class="flip-counter noselect">Flips: 0 / 11</span>
+							<label for="undobutton" id="undobuttonlabel" class="undo-button-label noselect">
+								<input id="undobutton" type="button" />
+								Undo
+							</label>
+							<label for="resetbutton" id="resetbuttonlabel" class="reset-button-label noselect">
+								<input id="resetbutton" type="button" />
+								Reset
+							</label>
+						</div>
+						<div id="collapsebox" class="collapse-box">
+							<div class="h-separator"></div>
+							<div id="advancedsettings" class="advanced-settings-box">
+								<div class="settings-grid">
+									<div class="settings-group">
+										<h4>Strategy</h4>
+										<div class="option-row">
+											<input type="checkbox" id="spreadsheet" checked />
+											<label for="spreadsheet">Show Fox Sightings</label>
+										</div>
+										<div class="option-row">
+											<input type="checkbox" id="lookforfox" checked />
+											<label for="lookforfox">Factor Fox into Recommendation</label>
+										</div>
 									</div>
-									<div class="option-row">
-										<input type="checkbox" id="lookforfox" checked>
-										<label for="lookforfox">Factor Fox into Recommendation</label>
+									<div class="settings-group">
+										<h4>Weights</h4>
+										<p class="settings-hint">
+											Sword weight is set by First/Second Retelling. Fox and Coffer weights are
+											saved between visits.
+										</p>
+										<div class="weight-row">
+											<label for="foxweight">Fox</label>
+											<input
+												type="number"
+												id="foxweight"
+												value="100"
+												min="0"
+												max="100"
+												class="weights"
+											/>
+										</div>
+										<div class="weight-row">
+											<label id="boxweightlabel" for="boxweight">Coffer</label>
+											<input
+												type="number"
+												id="boxweight"
+												value="35"
+												min="0"
+												max="100"
+												class="weights"
+											/>
+										</div>
+										<div class="weight-row">
+											<label for="swordweight">Swords</label>
+											<input
+												type="number"
+												id="swordweight"
+												value="90"
+												min="0"
+												max="100"
+												class="weights"
+											/>
+										</div>
 									</div>
-								</div>
-								<div class="settings-group">
-									<h4>Weights</h4>
-									<p class="settings-hint">Sword weight is set by First/Second Retelling. Fox and Coffer weights are saved between visits.</p>
-									<div class="weight-row">
-										<label for="foxweight">Fox</label>
-										<input type="number" id="foxweight" value="100" min="0" max="100" class="weights">
-									</div>
-									<div class="weight-row">
-										<label id="boxweightlabel" for="boxweight">Coffer</label>
-										<input type="number" id="boxweight" value="35" min="0" max="100" class="weights">
-									</div>
-									<div class="weight-row">
-										<label for="swordweight">Swords</label>
-										<input type="number" id="swordweight" value="90" min="0" max="100" class="weights">
-									</div>
-								</div>
-								<div class="settings-group">
-									<h4>Options</h4>
-									<div class="option-row">
-										<input type="radio" id="box1" name="boxtype" value="box1" checked>
-										<label for="box1">Coffer</label>
-									</div>
-									<div class="option-row">
-										<input type="radio" id="box2" name="boxtype" value="box2">
-										<label for="box2">Gift Box</label>
-									</div>
-									<div class="settings-divider"></div>
-									<div class="option-row">
-										<input type="checkbox" id="showstats">
-										<label for="showstats">Show Stats</label>
-									</div>
-									<div class="option-row">
-										<input type="checkbox" id="liveupdate" checked>
-										<label for="liveupdate">Live Update</label>
+									<div class="settings-group">
+										<h4>Options</h4>
+										<div class="option-row">
+											<input type="radio" id="box1" name="boxtype" value="box1" checked />
+											<label for="box1">Coffer</label>
+										</div>
+										<div class="option-row">
+											<input type="radio" id="box2" name="boxtype" value="box2" />
+											<label for="box2">Gift Box</label>
+										</div>
+										<div class="settings-divider"></div>
+										<div class="option-row">
+											<input type="checkbox" id="showstats" />
+											<label for="showstats">Show Stats</label>
+										</div>
+										<div class="option-row">
+											<input type="checkbox" id="liveupdate" checked />
+											<label for="liveupdate">Live Update</label>
+										</div>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
 				</div>
-			</div>
-			<div id="about" class="contentpane dp-low rounded about">
-				<div class="dp-high rounded about-pane">
-					<h3 style="margin-top: 0">How to Use</h3>
-					<ol style="margin: 0; padding-left: 20px;">
-						<li>Mark the diagonal half of the board the game shows as Blocked (does not use flips).</li>
-						<li>Select First Retelling or Second Retelling above the picker to match where you are in the minigame.</li>
-						<li>As you flip cards, select the matching picker item (Missed, Coffer, Swords, Fox) and click the cell.</li>
-						<li>The solver recalculates after every mark and highlights the best cell to flip next with a gold crosshair.</li>
-					</ol>
-					<p class="about-tip"><strong>Tips:</strong> Long-press a cell to erase it without switching to Erase. Use Undo for the last mark. On phones, the tool picker stays near the board.</p>
-					<h3>How It Scores Cells</h3>
-					<span>Faux Hollows always places its four pieces (fox, coffer, swords, blocked cells) in fixed shapes on the 6x6 board. Every time you mark a cell, the solver narrows down every board layout still consistent with what you've seen, and turns that into a probability that each remaining cell hides the fox, coffer, or swords. Those probabilities are combined using the weights in the Advanced menu, and cells are also zeroed out once you no longer have enough flips left to complete the shape they'd belong to.</span>
-					<p>When a coffer or swords shape is fully determined, the solver fills those cells automatically. These are deductions, not flips, and do not use your flip budget.</p>
-					<h3>Disclaimer</h3>
-					<span>This calculator will NOT guarantee anything. Not a single reward is guaranteed for using this tool. What it provides is a statistical advantage.</span>
-					<h3>Attribution</h3>
-					<span>Forked from <a href="https://github.com/Sturalke/FauxHollowsProbabilisticSolver">Sturalke's original solver</a> &mdash; refactored the scoring logic and added the First/Second Retelling sword-value mechanic, mobile UI, and GitHub Pages hosting for this fork.</span>
+				<div id="about" class="contentpane dp-low rounded about">
+					<div class="dp-high rounded about-pane">
+						<h3 style="margin-top: 0">How to Use</h3>
+						<ol style="margin: 0; padding-left: 20px">
+							<li>Mark the diagonal half of the board the game shows as Blocked (does not use flips).</li>
+							<li>
+								Select First Retelling or Second Retelling above the picker to match where you are in
+								the minigame.
+							</li>
+							<li>
+								As you flip cards, select the matching picker item (Missed, Coffer, Swords, Fox) and
+								click the cell.
+							</li>
+							<li>
+								The solver recalculates after every mark and highlights the best cell to flip next with
+								a gold crosshair.
+							</li>
+						</ol>
+						<p class="about-tip">
+							<strong>Tips:</strong>
+							Long-press a cell to erase it without switching to Erase. Use Undo for the last mark. On
+							phones, the tool picker stays near the board.
+						</p>
+						<h3>How It Scores Cells</h3>
+						<span>
+							Faux Hollows always places its four pieces (fox, coffer, swords, blocked cells) in fixed
+							shapes on the 6x6 board. Every time you mark a cell, the solver narrows down every board
+							layout still consistent with what you've seen, and turns that into a probability that each
+							remaining cell hides the fox, coffer, or swords. Those probabilities are combined using the
+							weights in the Advanced menu, and cells are also zeroed out once you no longer have enough
+							flips left to complete the shape they'd belong to.
+						</span>
+						<p>
+							When a coffer or swords shape is fully determined, the solver fills those cells
+							automatically. These are deductions, not flips, and do not use your flip budget.
+						</p>
+						<h3>Disclaimer</h3>
+						<span>
+							This calculator will NOT guarantee anything. Not a single reward is guaranteed for using
+							this tool. What it provides is a statistical advantage.
+						</span>
+						<h3>Attribution</h3>
+						<span>
+							Forked from
+							<a href="https://github.com/Sturalke/FauxHollowsProbabilisticSolver">
+								Sturalke's original solver
+							</a>
+							&mdash; refactored the scoring logic and added the First/Second Retelling sword-value
+							mechanic, mobile UI, and GitHub Pages hosting for this fork.
+						</span>
+					</div>
 				</div>
 			</div>
 		</div>
-	</div>
-	<!--Load JS last-->
-	<script src="code.js?v=19"></script>
-	<script>
-	if ("serviceWorker" in navigator) {
-		navigator.serviceWorker.register("./sw.js", { scope: "./" }).catch(function() {});
-	}
-	</script>
-</body>
-
+		<!--Load JS last-->
+		<script src="code.js?v=20"></script>
+		<script>
+			if ("serviceWorker" in navigator) {
+				navigator.serviceWorker.register("./sw.js", { scope: "./" }).catch(function () {});
+			}
+		</script>
+	</body>
 </html>

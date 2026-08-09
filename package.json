@@ -1,0 +1,11 @@
+{
+	"private": true,
+	"scripts": {
+		"format": "prettier --write . && ruff format scraper.py",
+		"format:check": "prettier --check . && ruff format --check scraper.py",
+		"lint:python": "ruff check scraper.py"
+	},
+	"devDependencies": {
+		"prettier": "3.9.6"
+	}
+}
