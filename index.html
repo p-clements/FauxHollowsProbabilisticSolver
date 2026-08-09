@@ -7,8 +7,8 @@
 		<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover" />
 		<meta name="theme-color" content="#0b0e14" />
 		<link rel="manifest" href="manifest.json" />
-		<!-- asset-version: 21 -->
-		<link rel="stylesheet" type="text/css" href="style.css?v=21" />
+		<!-- asset-version: 22 -->
+		<link rel="stylesheet" type="text/css" href="style.css?v=22" />
 		<link rel="shortcut icon" href="images/logo.png" type="image/png" />
 		<link rel="apple-touch-icon" href="images/apple-touch-icon.png" />
 		<meta name="apple-mobile-web-app-capable" content="yes" />
@@ -92,7 +92,7 @@
 									id="button3"
 									for="chestradiobutton"
 									class="radiobuttonlabel optransition"
-									title="Chest"
+									title="Coffer"
 								>
 									<input type="radio" id="chestradiobutton" name="pickeritem" value="chest" />
 									<img
@@ -189,10 +189,10 @@
 										</div>
 									</div>
 									<div class="settings-group">
-										<h4>Weights</h4>
+										<h4>Strategy values</h4>
 										<p class="settings-hint">
-											Sword weight is set by First/Second Retelling. Fox and Coffer weights are
-											saved between visits.
+											Sword value is set by First/Second Retelling. Fox value is saved between
+											visits.
 										</p>
 										<div class="weight-row">
 											<label for="foxweight">Fox</label>
@@ -200,17 +200,6 @@
 												type="number"
 												id="foxweight"
 												value="100"
-												min="0"
-												max="100"
-												class="weights"
-											/>
-										</div>
-										<div class="weight-row">
-											<label id="boxweightlabel" for="boxweight">Coffer</label>
-											<input
-												type="number"
-												id="boxweight"
-												value="35"
 												min="0"
 												max="100"
 												class="weights"
@@ -230,15 +219,6 @@
 									</div>
 									<div class="settings-group">
 										<h4>Options</h4>
-										<div class="option-row">
-											<input type="radio" id="box1" name="boxtype" value="box1" checked />
-											<label for="box1">Coffer</label>
-										</div>
-										<div class="option-row">
-											<input type="radio" id="box2" name="boxtype" value="box2" />
-											<label for="box2">Gift Box</label>
-										</div>
-										<div class="settings-divider"></div>
 										<div class="option-row">
 											<input type="checkbox" id="showstats" />
 											<label for="showstats">Show Stats</label>
@@ -282,8 +262,8 @@
 							shapes on the 6x6 board. Every time you mark a cell, the solver narrows down every board
 							layout still consistent with what you've seen, and turns that into a probability that each
 							remaining cell hides the fox, coffer, or swords. Those probabilities are combined using the
-							weights in the Advanced menu, and cells are also zeroed out once you no longer have enough
-							flips left to complete the shape they'd belong to.
+							strategy values in the Advanced menu, and cells are also zeroed out once you no longer have
+							enough flips left to complete the shape they'd belong to.
 						</span>
 						<p>
 							When a coffer or swords shape is fully determined, the solver fills those cells
@@ -310,7 +290,7 @@
 			</div>
 		</div>
 		<!--Load JS last-->
-		<script src="code.js?v=21"></script>
+		<script src="code.js?v=22"></script>
 		<script>
 			if ("serviceWorker" in navigator) {
 				navigator.serviceWorker.register("./sw.js", { scope: "./" }).catch(function () {});

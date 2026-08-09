@@ -1,15 +1,14 @@
-const CACHE = "fhs-v21";
+const CACHE = "fhs-v22";
 const ASSETS = [
 	"./",
 	"./index.html",
-	"./style.css?v=21",
-	"./code.js?v=21",
+	"./style.css?v=22",
+	"./code.js?v=22",
 	"./data.js",
 	"./manifest.json",
 	"./images/blocked.png",
 	"./images/missed.png",
 	"./images/chest.png",
-	"./images/present.png",
 	"./images/swords.png",
 	"./images/fox.png",
 	"./images/erase.png",
