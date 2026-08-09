@@ -98,7 +98,7 @@ a:active {
 	grid-template-columns: repeat(6, 1fr);
 	grid-template-rows: repeat(6, 1fr);
 	gap: 8px;
-	width: min(100%, 600px, var(--fhs-board-max, 600px));
+	width: min(100%, 600px);
 	aspect-ratio: 1;
 	margin: 0 auto;
 }
@@ -451,15 +451,18 @@ input[type=number] {
 }
 
 
-/* Sticky controls (picker stays reachable on mobile) */
+/* Controls stay in normal flow unless the full panel fits without covering the board. */
 .controls-sticky {
-	position: sticky;
-	bottom: 0;
+	position: static;
 	z-index: 15;
 	background: rgba(11, 14, 20, 0.92);
 	backdrop-filter: blur(12px);
 	-webkit-backdrop-filter: blur(12px);
 	padding-bottom: max(16px, env(safe-area-inset-bottom));
+}
+.controls-sticky.controls-sticky-active {
+	position: sticky;
+	bottom: 0;
 }
 
 .radiobuttonlabel {

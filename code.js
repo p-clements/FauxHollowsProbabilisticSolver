@@ -275,9 +275,12 @@ function RestoreSettings() {
 		if (collapse && !collapse.style.maxHeight) {
 			collapse.style.maxHeight = collapse.scrollHeight + "px";
 			if (arrow) arrow.classList.add("arrow-rotated");
-			updateBoardMax();
 		}
 	}
+	// applyGameWeekPreset() saves before the pane is restored; persist the final
+	// restored layout state as well.
+	SaveSettings();
+	updateControlsSticky();
 }
 
 
@@ -297,7 +300,7 @@ document.getElementById("menucollapse").addEventListener("click", function() {
 	} else {
 		collapse.style.maxHeight = collapse.scrollHeight + "px";
 	}
-	updateBoardMax();
+	updateControlsSticky();
 	SaveSettings();
 });
 var collapselabel = document.getElementById("collapselabel");
@@ -506,31 +509,23 @@ window.addEventListener("scroll", function() {
 	}
 }, { passive: true });
 
-// The picker bar is position: sticky so it stays reachable while scrolling the board.
-// A sticky bottom element docks at the viewport's bottom edge as soon as its normal
-// position would otherwise fall below the fold - reserving space *before* it in the
-// flow doesn't stop that, since the dock point is measured from the viewport, not from
-// how much room precedes the bar. So instead of reserving space for the bar, cap the
-// board so the header, board, gap, and bar all fit within one viewport at rest; sticky
-// only engages once content genuinely exceeds the viewport (e.g. Advanced expanded on
-// a short screen), which is what it's for.
+// Bottom-sticky controls are useful only when the full panel fits below the board
+// at rest.  Otherwise leaving the panel in normal flow is safer than allowing a
+// tall sticky element to cover the board on short or mobile viewports.
 var controlsBarEl = document.querySelector(".controls-sticky");
-var boardGapEl = document.querySelector(".h-separator");
-var boardEl = document.getElementById("board");
-function updateBoardMax() {
-	if (!boardEl || !controlsBarEl || !boardGapEl) return;
-	var boardTop = boardEl.getBoundingClientRect().top + window.scrollY;
-	var contentBottomPad = parseFloat(getComputedStyle(contentPane).paddingBottom) || 0;
-	var bodyBottomPad = parseFloat(getComputedStyle(document.body).paddingBottom) || 0;
-	var available = window.innerHeight - boardTop - boardGapEl.offsetHeight - controlsBarEl.offsetHeight - contentBottomPad - bodyBottomPad;
-	document.documentElement.style.setProperty("--fhs-board-max", Math.max(220, Math.floor(available)) + "px");
+function updateControlsSticky() {
+	if (!controlsBarEl) return;
+	controlsBarEl.classList.remove("controls-sticky-active");
+	var normalBottom = controlsBarEl.getBoundingClientRect().bottom;
+	controlsBarEl.classList.toggle("controls-sticky-active", normalBottom <= window.innerHeight);
 }
-if (controlsBarEl) {
-	updateBoardMax();
-	window.addEventListener("resize", updateBoardMax);
-	if (window.ResizeObserver) {
-		new ResizeObserver(updateBoardMax).observe(controlsBarEl);
-	}
+updateControlsSticky();
+window.addEventListener("resize", updateControlsSticky);
+if (controlsBarEl && window.ResizeObserver) {
+	new ResizeObserver(updateControlsSticky).observe(controlsBarEl);
+}
+if (document.fonts && document.fonts.ready) {
+	document.fonts.ready.then(updateControlsSticky);
 }
 
 /*
@@ -557,8 +552,13 @@ function pickerItemToState(pickedItem) {
 	}
 }
 
-function pushUndo(cellId, prevState, flipDelta) {
-	window.fhs_undo.push({ id: cellId, prevState: prevState, flipDelta: flipDelta });
+function pushUndo(cellId, prevState, flipDelta, prevSolverFilled) {
+	window.fhs_undo.push({
+		id: cellId,
+		prevState: prevState,
+		flipDelta: flipDelta,
+		prevSolverFilled: prevSolverFilled
+	});
 	if (window.fhs_undo.length > fhs_undo_max) {
 		window.fhs_undo.shift();
 	}
@@ -566,6 +566,7 @@ function pushUndo(cellId, prevState, flipDelta) {
 
 function applyCellMark(cell, pickedItem, fromLongPress) {
 	var prevState = cell.getAttribute("data-state");
+	var prevSolverFilled = cell.getAttribute("data-solver-filled") === "true";
 	var newState = pickerItemToState(pickedItem);
 	if (newState == null) {
 		console.error("Radio button value invalid.");
@@ -575,7 +576,7 @@ function applyCellMark(cell, pickedItem, fromLongPress) {
 		return;
 	}
 
-	var wasFlip = isFlipState(prevState);
+	var wasFlip = isFlipState(prevState) && !prevSolverFilled;
 	var isFlip = isFlipState(newState);
 	var flipDelta = 0;
 	if (!wasFlip && isFlip) {
@@ -584,8 +585,9 @@ function applyCellMark(cell, pickedItem, fromLongPress) {
 		flipDelta = -1;
 	}
 
-	pushUndo(cell.id, prevState, flipDelta);
+	pushUndo(cell.id, prevState, flipDelta, prevSolverFilled);
 	cell.setAttribute("data-state", newState);
+	cell.removeAttribute("data-solver-filled");
 	if (flipDelta !== 0) {
 		window.fhs_flips_used = Math.max(0, window.fhs_flips_used + flipDelta);
 		UpdateFlipCounter();
@@ -608,6 +610,11 @@ function UndoLast() {
 	var cell = document.getElementById(entry.id);
 	if (!cell) return;
 	cell.setAttribute("data-state", entry.prevState);
+	if (entry.prevSolverFilled) {
+		cell.setAttribute("data-solver-filled", "true");
+	} else {
+		cell.removeAttribute("data-solver-filled");
+	}
 	window.fhs_flips_used = Math.max(0, window.fhs_flips_used - entry.flipDelta);
 	UpdateFlipCounter();
 	UpdateCell(cell);
@@ -716,11 +723,10 @@ function UpdateCoffer() {
 	
 	var cells = document.getElementsByClassName('board-cell');
 	Array.prototype.forEach.call(cells, function(cell) {
-		var childImage = cell.querySelector("img");
 		var state_value = cell.getAttribute("data-state");
 		if (state_value == fhs_chest_state) {
-			childImage.setAttribute('src', url);
-			cell.setAttribute('title', name);
+			// Re-apply all state-derived cell metadata, including aria-label.
+			UpdateCell(cell);
 		}
 	});
 }
@@ -892,8 +898,10 @@ function ResetBoard() {
 	var cells = document.getElementsByClassName("board-cell");
 	Array.prototype.forEach.call(cells, function(cell) {
 		cell.setAttribute("data-state", fhs_empty_state);
+		cell.removeAttribute("data-solver-filled");
 		UpdateCell(cell);
 	});
+	window.fhs_grid = PrefillArray();
 	window.fhs_grid_scores = PrefillArray();
 	UpdateScoresInCells();
 	window.fhs_flips_used = 0;
@@ -1126,16 +1134,19 @@ outerloop:
 }
 
 function IdentifyPattern() {
-	var positions = [0,0,0,0,0];
-	var ind = 0;
+	var positions = [];
 	for (var i = 0; i < 6; i++) {
 		for (var j = 0; j < 6; j++) {
-			if (fhs_grid[i][j] == 1 && ind < 5) {
-				positions[ind++] = i*6 + j;
-			} else if (ind > 5) {
-				return -1;
+			if (fhs_grid[i][j] == 1) {
+				if (positions.length >= 5) {
+					return -1;
+				}
+				positions.push(i * 6 + j);
 			}
 		}
+	}
+	if (positions.length !== 5) {
+		return -1;
 	}
 	var exists = fhs_sheet_patterns.some(row => JSON.stringify(row) === JSON.stringify(positions));
 	if (exists) {
@@ -1168,6 +1179,7 @@ function MarkGuaranteedBlocks() {
 				var numStr = IndexFormat(j + 6 * i);
 				var cell = document.getElementById("cell" + numStr);
 				cell.setAttribute("data-state", fhs_chest_state);
+				cell.setAttribute("data-solver-filled", "true");
 				UpdateCell(cell);
 			}
 		}
@@ -1182,6 +1194,7 @@ function MarkGuaranteedBlocks() {
 				var numStr = IndexFormat(j + 6 * i);
 				var cell = document.getElementById("cell" + numStr);
 				cell.setAttribute("data-state", fhs_swords_state);
+				cell.setAttribute("data-solver-filled", "true");
 				UpdateCell(cell);
 			}
 		}
