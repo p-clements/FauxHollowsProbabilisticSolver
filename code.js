@@ -41,6 +41,7 @@ const fhs_verified_state = "7";
 const fhs_sighting_state = "8";
 const fhs_prediction_verified_state = "9";
 const fhs_prediction_sighting_state = "10";
+const fhs_coffer_value = 35;
 
 function IndexFormat(index) {
 	var str = "0" + index;
@@ -258,6 +259,7 @@ function SaveSettings() {
 		liveupdate: document.getElementById("liveupdate").checked,
 		gameweek2: document.getElementById("gameweek2").checked,
 		foxweight: String(normalizeWeightInput("foxweight", 100)),
+		coffervalue: String(normalizeWeightInput("coffervalue", fhs_coffer_value)),
 		advancedOpen: !!(collapse && collapse.style.maxHeight)
 	};
 	localStorage.setItem("settings", JSON.stringify(settings));
@@ -296,6 +298,10 @@ function RestoreSettings() {
 
 	if (settingsObject.foxweight != null) {
 		document.getElementById("foxweight").value = settingsObject.foxweight;
+	}
+	if (settingsObject.coffervalue != null || settingsObject.boxweight != null) {
+		document.getElementById("coffervalue").value =
+			settingsObject.coffervalue != null ? settingsObject.coffervalue : settingsObject.boxweight;
 	}
 
 	// Retelling owns sword weight (overwrites any custom sword value)
@@ -1281,11 +1287,11 @@ function normalizeWeightInput(id, fallback) {
 	return value;
 }
 
-// A coffer is always the medium reward in this solver. Its fixed reward value
-// is used for expected-value scoring; it is not a user-adjustable setting.
-const fhs_coffer_value = 35;
+// A coffer is always the medium reward in this solver. Its default reward value
+// is used for expected-value scoring and can be adjusted as a strategy value.
 function GetCofferValue() {
-	return MinFlipsToCompleteCoffer() > GetFlipsRemaining() ? 0 : fhs_coffer_value;
+	var base = normalizeWeightInput("coffervalue", fhs_coffer_value);
+	return MinFlipsToCompleteCoffer() > GetFlipsRemaining() ? 0 : base;
 }
 
 function GetSwordsWeight() {
