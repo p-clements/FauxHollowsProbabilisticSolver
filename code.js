@@ -1556,7 +1556,7 @@ function RequestPlan(analysis) {
 	};
 	if (fhs_plan_worker === null && window.Worker) {
 		try {
-			fhs_plan_worker = new Worker("planner-worker.js?v=27");
+			fhs_plan_worker = new Worker("planner-worker.js?v=28");
 			fhs_plan_worker.onmessage = function (e) {
 				ApplyPlan(e.data.id, e.data.result);
 			};

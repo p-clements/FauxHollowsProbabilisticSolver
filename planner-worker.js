@@ -1,6 +1,6 @@
 // Runs the look-ahead planner off the main thread. One planner (and its cache) is kept per
 // board pattern, Fox chance and set of strategy values, so later moves in a game are instant.
-importScripts("data.js", "planner.js?v=27");
+importScripts("data.js", "planner.js?v=28");
 
 var fhs_cached = null;
 
