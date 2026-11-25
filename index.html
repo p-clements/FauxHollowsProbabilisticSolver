@@ -5,10 +5,10 @@
 		<title>Faux Hollows Solver</title>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover" />
-		<meta name="theme-color" content="#0b0e14" />
+		<meta name="theme-color" content="#0c1a30" />
 		<link rel="manifest" href="manifest.json" />
-		<!-- asset-version: 24 -->
-		<link rel="stylesheet" type="text/css" href="style.css?v=24" />
+		<!-- asset-version: 27 -->
+		<link rel="stylesheet" type="text/css" href="style.css?v=27" />
 		<link rel="shortcut icon" href="images/logo.png" type="image/png" />
 		<link rel="apple-touch-icon" href="images/apple-touch-icon.png" />
 		<meta name="apple-mobile-web-app-capable" content="yes" />
@@ -17,10 +17,11 @@
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link
-			href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Roboto:wght@300&display=swap"
+			href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Noto+Sans:wght@400;500;600&family=Noto+Serif:wght@600&display=swap"
 			rel="stylesheet"
 		/>
 		<script type="text/javascript" src="data.js"></script>
+		<script type="text/javascript" src="planner.js?v=27"></script>
 	</head>
 
 	<body>
@@ -28,11 +29,40 @@
 			<div id="main">
 				<header id="site-header" class="dp-high rounded about-header site-header noselect">
 					<h1>Faux Hollows Solver</h1>
+					<p class="site-tagline">Plans your flips from recorded boards.</p>
 					<img src="images/fox.png" class="about-fox-watermark" alt="" aria-hidden="true" />
 				</header>
 				<div id="content" class="contentpane dp-low rounded">
 					<div id="board" class="board" aria-label="Faux Hollows board"></div>
-					<div id="prediction-live" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+					<section id="status" class="status" aria-label="Solver status">
+						<p id="prediction-live" class="status-headline" aria-live="polite" aria-atomic="true">
+							Mark the 5 blocked tiles to start.
+						</p>
+						<span class="status-planning-label" aria-hidden="true">Planning ahead…</span>
+						<ul id="status-notes" class="status-notes"></ul>
+						<ul class="legend" aria-label="Board legend">
+							<li>
+								<span class="legend-swatch legend-suggest"></span>
+								Best next flip
+							</li>
+							<li>
+								<span class="legend-swatch legend-heat"></span>
+								Shading: chance of a piece
+							</li>
+							<li>
+								<span class="legend-swatch legend-certain"></span>
+								Certain, not flipped yet
+							</li>
+							<li>
+								<span class="legend-swatch legend-fox"></span>
+								Possible Fox spot
+							</li>
+							<li>
+								<span class="legend-swatch legend-reach"></span>
+								Piece can't be finished
+							</li>
+						</ul>
+					</section>
 					<div class="h-separator"></div>
 					<div class="dp-high rounded controls controls-sticky">
 						<div class="game-toggle noselect" role="radiogroup" aria-label="Game version">
@@ -181,18 +211,30 @@
 										<h4>Strategy</h4>
 										<div class="option-row">
 											<input type="checkbox" id="spreadsheet" checked />
-											<label for="spreadsheet">Show Fox Sightings</label>
+											<label for="spreadsheet">Use community board layouts</label>
 										</div>
 										<div class="option-row">
 											<input type="checkbox" id="lookforfox" checked />
 											<label for="lookforfox">Factor Fox into Recommendation</label>
 										</div>
+										<div class="weight-row">
+											<label for="foxchance">Fox shows up in (% of games)</label>
+											<input
+												type="number"
+												id="foxchance"
+												value="50"
+												min="0"
+												max="100"
+												class="weights"
+											/>
+										</div>
 									</div>
 									<div class="settings-group">
 										<h4>Strategy values</h4>
 										<p class="settings-hint">
-											Sword value is set by First/Second Retelling. Fox and Coffer values are
-											saved between visits.
+											Set by First/Second Retelling. First: swords and coffer first. Second: one
+											swords cell counts, then coffer and Fox. Edits last until you switch or
+											reload.
 										</p>
 										<div class="weight-row">
 											<label for="foxweight">Fox</label>
@@ -259,7 +301,7 @@
 							</li>
 							<li>
 								The solver recalculates after every mark and highlights the best cell to flip next with
-								a gold crosshair.
+								a ring. Read the status panel under the board for why.
 							</li>
 						</ol>
 						<p class="about-tip">
@@ -267,20 +309,23 @@
 							Long-press a cell to erase it without switching to Erase. Use Undo for the last mark. On
 							phones, the tool picker stays near the board.
 						</p>
-						<h3>How It Scores Cells</h3>
-						<span>
-							Faux Hollows always places its four pieces (fox, coffer, swords, blocked cells) in fixed
-							shapes on the 6x6 board. Every time you mark a cell, the solver narrows down every board
-							layout still consistent with what you've seen, and turns that into a probability that each
-							remaining cell hides the fox, coffer, or swords. Those probabilities are combined using the
-							strategy values in the Advanced menu, and cells are also zeroed out once you no longer have
-							enough flips left to complete the shape they'd belong to.
-						</span>
+						<h3>How It Chooses</h3>
 						<p>
-							When a coffer or swords shape is fully determined, the solver fills those cells
-							automatically. These are deductions, not flips, and do not use your flip budget. To record
-							that you have actually flipped one, select the matching picker item and click the inferred
-							cell; it will then count against your flip budget.
+							Once all 5 blocked tiles are marked, the solver matches them against the community
+							spreadsheet of recorded boards. That leaves a handful of possible layouts, and every flip
+							you record rules more of them out. The solver then plans the rest of the game ahead: it
+							picks the flip that earns the most on average across those layouts, using the values in the
+							Advanced menu, within your 11 flips.
+						</p>
+						<p>
+							If a board isn't in the spreadsheet, it falls back to fitting the shapes onto the board and
+							picking the best single flip. A piece only pays out once every one of its cells is flipped,
+							so a piece that needs more cells than you have flips left is outlined and ignored.
+						</p>
+						<p>
+							Cells the solver is certain about are filled in with a dashed border. They don't use your
+							flips until you flip them for real: select the matching picker item and click the cell.
+							Leave them for last, because they can't tell you anything new.
 						</p>
 						<h3>Disclaimer</h3>
 						<span>
@@ -301,7 +346,7 @@
 			</div>
 		</div>
 		<!--Load JS last-->
-		<script src="code.js?v=24"></script>
+		<script src="code.js?v=27"></script>
 		<script>
 			if ("serviceWorker" in navigator) {
 				navigator.serviceWorker.register("./sw.js", { scope: "./" }).catch(function () {});

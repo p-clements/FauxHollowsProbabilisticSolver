@@ -10,15 +10,16 @@ const fhs_sighting_icon_url = "images/sighting.png";
 const fhs_blank_icon_uri =
 	"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVR4nGNgAAIAAAUAAXpeqz8AAAAASUVORK5CYII=";
 
-const fhs_blocked_color = "rgb(140, 140, 140)";
-const fhs_missed_color = "rgb(255, 80, 80)";
-const fhs_chest_color = "rgb(102, 255, 51)";
-const fhs_swords_color = "rgb(51, 204, 255)";
-const fhs_fox_color = "rgb(153, 51, 204)";
-const fhs_empty_color = "rgb(237, 225, 200)";
-const fhs_prediction_color = "rgb(255,215,0)";
-const fhs_verified_color = "rgb(255,51,255)";
-const fhs_sighting_color = "rgb(255,153,51)";
+const fhs_blocked_color = "rgb(92, 106, 130)";
+const fhs_missed_color = "rgb(214, 64, 88)";
+const fhs_chest_color = "rgb(217, 186, 84)";
+const fhs_swords_color = "rgb(76, 126, 232)";
+const fhs_fox_color = "rgb(146, 108, 222)";
+const fhs_empty_color = "rgb(234, 241, 249)";
+// Suggestions and Fox spots keep the unflipped tile colour; CSS draws their rings.
+const fhs_prediction_color = fhs_empty_color;
+const fhs_verified_color = fhs_empty_color;
+const fhs_sighting_color = fhs_empty_color;
 
 const fhs_blocked_name = "Blocked";
 const fhs_missed_name = "Missed";
@@ -26,9 +27,9 @@ const fhs_chest_name = "Coffer";
 const fhs_swords_name = "Swords";
 const fhs_fox_name = "Fox";
 const fhs_empty_name = "Empty";
-const fhs_prediction_name = "Prediction";
-const fhs_verified_name = "Verified Sighting";
-const fhs_sighting_name = "Sighting";
+const fhs_prediction_name = "Suggested flip";
+const fhs_verified_name = "Possible Fox spot";
+const fhs_sighting_name = "Reported Fox sighting";
 
 const fhs_blocked_state = "1";
 const fhs_missed_state = "2";
@@ -41,7 +42,7 @@ const fhs_verified_state = "7";
 const fhs_sighting_state = "8";
 const fhs_prediction_verified_state = "9";
 const fhs_prediction_sighting_state = "10";
-const fhs_coffer_value = 35;
+const fhs_fox_chance_default = 50;
 
 function IndexFormat(index) {
 	var str = "0" + index;
@@ -73,8 +74,7 @@ const CELL_META = {
 		color: fhs_empty_color,
 		icon: function () {
 			return fhs_blank_icon_uri;
-		},
-		diagonalMix: false
+		}
 	},
 	[fhs_blocked_state]: {
 		name: function () {
@@ -83,8 +83,7 @@ const CELL_META = {
 		color: fhs_blocked_color,
 		icon: function () {
 			return fhs_blocked_icon_url;
-		},
-		diagonalMix: false
+		}
 	},
 	[fhs_missed_state]: {
 		name: function () {
@@ -93,8 +92,7 @@ const CELL_META = {
 		color: fhs_missed_color,
 		icon: function () {
 			return fhs_missed_icon_url;
-		},
-		diagonalMix: false
+		}
 	},
 	[fhs_chest_state]: {
 		name: function () {
@@ -103,8 +101,7 @@ const CELL_META = {
 		color: fhs_chest_color,
 		icon: function () {
 			return fhs_chest_icon_url;
-		},
-		diagonalMix: false
+		}
 	},
 	[fhs_swords_state]: {
 		name: function () {
@@ -113,8 +110,7 @@ const CELL_META = {
 		color: fhs_swords_color,
 		icon: function () {
 			return fhs_swords_icon_url;
-		},
-		diagonalMix: false
+		}
 	},
 	[fhs_fox_state]: {
 		name: function () {
@@ -123,8 +119,7 @@ const CELL_META = {
 		color: fhs_fox_color,
 		icon: function () {
 			return fhs_fox_icon_url;
-		},
-		diagonalMix: false
+		}
 	},
 	[fhs_prediction_state]: {
 		name: function () {
@@ -133,8 +128,7 @@ const CELL_META = {
 		color: fhs_prediction_color,
 		icon: function () {
 			return fhs_prediction_icon_url;
-		},
-		diagonalMix: false
+		}
 	},
 	[fhs_verified_state]: {
 		name: function () {
@@ -143,8 +137,7 @@ const CELL_META = {
 		color: fhs_verified_color,
 		icon: function () {
 			return fhs_verified_icon_url;
-		},
-		diagonalMix: false
+		}
 	},
 	[fhs_sighting_state]: {
 		name: function () {
@@ -153,8 +146,7 @@ const CELL_META = {
 		color: fhs_sighting_color,
 		icon: function () {
 			return fhs_sighting_icon_url;
-		},
-		diagonalMix: false
+		}
 	},
 	[fhs_prediction_verified_state]: {
 		name: function () {
@@ -163,8 +155,7 @@ const CELL_META = {
 		color: fhs_verified_color,
 		icon: function () {
 			return fhs_prediction_icon_url;
-		},
-		diagonalMix: true
+		}
 	},
 	[fhs_prediction_sighting_state]: {
 		name: function () {
@@ -173,8 +164,7 @@ const CELL_META = {
 		color: fhs_sighting_color,
 		icon: function () {
 			return fhs_prediction_icon_url;
-		},
-		diagonalMix: false
+		}
 	}
 };
 
@@ -258,8 +248,7 @@ function SaveSettings() {
 		showstats: document.getElementById("showstats").checked,
 		liveupdate: document.getElementById("liveupdate").checked,
 		gameweek2: document.getElementById("gameweek2").checked,
-		foxweight: String(normalizeWeightInput("foxweight", 100)),
-		coffervalue: String(normalizeWeightInput("coffervalue", fhs_coffer_value)),
+		foxchance: String(normalizeWeightInput("foxchance", fhs_fox_chance_default)),
 		advancedOpen: !!(collapse && collapse.style.maxHeight)
 	};
 	localStorage.setItem("settings", JSON.stringify(settings));
@@ -296,15 +285,11 @@ function RestoreSettings() {
 	document.getElementById("gameweek2").checked = !!settingsObject.gameweek2;
 	document.getElementById("gameweek1").checked = !settingsObject.gameweek2;
 
-	if (settingsObject.foxweight != null) {
-		document.getElementById("foxweight").value = settingsObject.foxweight;
-	}
-	if (settingsObject.coffervalue != null || settingsObject.boxweight != null) {
-		document.getElementById("coffervalue").value =
-			settingsObject.coffervalue != null ? settingsObject.coffervalue : settingsObject.boxweight;
+	if (settingsObject.foxchance != null) {
+		document.getElementById("foxchance").value = settingsObject.foxchance;
 	}
 
-	// Retelling owns sword weight (overwrites any custom sword value)
+	// The retelling sets the Fox, coffer and sword values.
 	applyGameWeekPreset();
 
 	if (settingsObject.advancedOpen) {
@@ -779,16 +764,22 @@ function updateTitles() {
 	});
 }
 
-// Swords is only worth its 15-leaf payout on its own; in Game 1 finding it also
-// unlocks a whole second game via a retelling, which dwarfs the raw reward.
-const fhs_sword_weight_hunting_retelling = 90;
-const fhs_sword_weight_raw = 15;
+// First Retelling: finishing the swords unlocks the second game, so swords and coffer come
+// first. Second Retelling: one swords cell is enough, then the coffer and Fox matter.
+const fhs_game_presets = {
+	game1: { fox: 10, coffer: 70, swords: 100, swordsNeed: 6 },
+	game2: { fox: 50, coffer: 50, swords: 60, swordsNeed: 1 }
+};
+
+function currentPreset() {
+	return document.getElementById("gameweek2").checked ? fhs_game_presets.game2 : fhs_game_presets.game1;
+}
 
 function applyGameWeekPreset() {
-	var huntingRetelling = document.getElementById("gameweek1").checked;
-	document.getElementById("swordweight").value = huntingRetelling
-		? fhs_sword_weight_hunting_retelling
-		: fhs_sword_weight_raw;
+	var preset = currentPreset();
+	document.getElementById("foxweight").value = preset.fox;
+	document.getElementById("coffervalue").value = preset.coffer;
+	document.getElementById("swordweight").value = preset.swords;
 	SaveSettings();
 	LiveUpdate();
 }
@@ -822,7 +813,6 @@ function UpdateCell(cell) {
 	cell.style.backgroundColor = meta.color;
 	childImage.setAttribute("src", meta.icon());
 	cell.setAttribute("title", name);
-	cell.classList.toggle("diagonal-mix", !!meta.diagonalMix);
 	var idx = parseInt(cell.getAttribute("data-index"), 10);
 	if (!isNaN(idx)) {
 		var row = Math.floor(idx / 6) + 1;
@@ -868,7 +858,7 @@ function UpdateScoresInCells() {
 			) {
 				var v = window.fhs_grid_scores[i][j];
 				if (Number.isFinite(v)) {
-					next = v.toFixed(2);
+					next = Math.round(v * 100) + "%";
 				}
 			}
 			if (span.textContent !== next) {
@@ -943,8 +933,12 @@ function ResetBoard() {
 	window.fhs_flips_used = 0;
 	window.fhs_undo = [];
 	UpdateFlipCounter();
-	var live = document.getElementById("prediction-live");
-	if (live) live.textContent = "";
+	fhs_plan_request++;
+	Array.prototype.forEach.call(cells, function (cell) {
+		cell.style.removeProperty("--heat");
+		cell.classList.remove("cell-flip-now", "cell-out-of-reach");
+	});
+	RenderStatus("Mark the 5 blocked tiles to start.", [], false);
 }
 
 /*
@@ -1001,81 +995,6 @@ function ParseGrid() {
 				// Empty, Verified, Sighting, and Prediction states
 				window.fhs_grid[i][j] = 0;
 			}
-		}
-	}
-}
-
-function UpdatePrediction() {
-	var blockedCount = 0;
-	for (var i = 0; i < 6; i++) {
-		for (var j = 0; j < 6; j++) {
-			if (window.fhs_grid[i][j] == 1) {
-				blockedCount++;
-			}
-		}
-	}
-	if (blockedCount == 0) {
-		return;
-	}
-
-	var maxScore = 0;
-	for (var i = 0; i < 6; i++) {
-		for (var j = 0; j < 6; j++) {
-			var numStr = IndexFormat(j + 6 * i);
-			var cell = document.getElementById("cell" + numStr);
-
-			var state = cell.getAttribute("data-state");
-
-			if (state == fhs_prediction_state) {
-				cell.setAttribute("data-state", fhs_empty_state);
-				UpdateCell(cell);
-				maxScore = Math.max(fhs_grid_scores[i][j], maxScore);
-			} else if (state == fhs_prediction_verified_state) {
-				cell.setAttribute("data-state", fhs_verified_state);
-				UpdateCell(cell);
-				maxScore = Math.max(fhs_grid_scores[i][j], maxScore);
-			} else if (state == fhs_prediction_sighting_state) {
-				cell.setAttribute("data-state", fhs_sighting_state);
-				UpdateCell(cell);
-				maxScore = Math.max(fhs_grid_scores[i][j], maxScore);
-			} else if (state == fhs_empty_state || state == fhs_verified_state || state == fhs_sighting_state) {
-				maxScore = Math.max(fhs_grid_scores[i][j], maxScore);
-			}
-		}
-	}
-	var suggested = [];
-	if (maxScore != 0) {
-		for (var i = 0; i < 6; i++) {
-			for (var j = 0; j < 6; j++) {
-				var numStr = IndexFormat(j + 6 * i);
-				var cell = document.getElementById("cell" + numStr);
-				var state = cell.getAttribute("data-state");
-				var isMax = fhs_grid_scores[i][j] == maxScore;
-				if (isMax && state == fhs_empty_state) {
-					cell.setAttribute("data-state", fhs_prediction_state);
-					UpdateCell(cell);
-					suggested.push([i, j]);
-				} else if (isMax && state == fhs_verified_state) {
-					cell.setAttribute("data-state", fhs_prediction_verified_state);
-					UpdateCell(cell);
-					suggested.push([i, j]);
-				} else if (isMax && state == fhs_sighting_state) {
-					cell.setAttribute("data-state", fhs_prediction_sighting_state);
-					UpdateCell(cell);
-					suggested.push([i, j]);
-				}
-			}
-		}
-	}
-	var live = document.getElementById("prediction-live");
-	if (live) {
-		if (suggested.length) {
-			var parts = suggested.map(function (p) {
-				return "row " + (p[0] + 1) + ", column " + (p[1] + 1);
-			});
-			live.textContent = "Suggested flip: " + parts.join("; ");
-		} else {
-			live.textContent = "No suggestion";
 		}
 	}
 }
@@ -1241,40 +1160,431 @@ function runGuaranteed() {
 		MarkGuaranteedBlocks();
 	}
 
-	var lookingForFox = document.getElementById("lookforfox").checked;
-	window.fhs_grid_scores = lookingForFox
-		? weightedScores(CalculateFullProb())
-		: weightedWFScores(CalculateProbWithoutFox());
+	var analysis = AnalyzeBoard();
+	MarkCertainCells(analysis);
+	window.fhs_analysis = analysis;
+	window.fhs_grid_scores = ChanceGrid(analysis);
 	UpdateScoresInCells();
 	ClearPredictionsAndSightings();
-	UpdatePrediction();
 	UpdateSightings();
+
+	var move = FhsGreedyMove(
+		analysis.probs,
+		analysis.obs,
+		analysis.counts,
+		analysis.r,
+		analysis.values,
+		analysis.needs
+	);
+	analysis.planning = analysis.mode === "sheet" && analysis.r > 0 && analysis.blocked.length > 0;
+	ShowMove(analysis, move);
+	if (analysis.planning) RequestPlan(analysis);
+}
+
+var fhs_piece_names = { 5: "Fox", 3: "coffer", 4: "swords" };
+
+function cellAt(k) {
+	return document.getElementById("cell" + IndexFormat(k));
+}
+
+function isSolverFilled(cell) {
+	return cell.getAttribute("data-solver-filled") === "true";
+}
+
+var fhs_sheet_world_cache = {};
+function SheetWorldsFor(pattern, foxChance) {
+	var key = pattern + "@" + foxChance;
+	if (!fhs_sheet_world_cache[key]) {
+		fhs_sheet_world_cache[key] = FhsSheetWorlds(fhs_sheet_fox[pattern], foxChance);
+	}
+	return fhs_sheet_world_cache[key];
+}
+
+function GetFoxChance() {
+	return normalizeWeightInput("foxchance", fhs_fox_chance_default) / 100;
+}
+
+function GeometricProbabilities(lookingForFox) {
+	if (lookingForFox) {
+		var full = CalculateFullProb();
+		return { 5: full[0].flat(), 3: full[1].flat(), 4: full[2].flat() };
+	}
+	var noFox = CalculateProbWithoutFox();
+	return { 5: new Array(36).fill(0), 3: noFox[0].flat(), 4: noFox[1].flat() };
+}
+
+// Board as the solver sees it: only flips the player has confirmed count as observations.
+function AnalyzeBoard() {
+	var obs = new Array(36).fill(-1);
+	var counts = [0, 0, 0];
+	var blocked = [];
+	for (var k = 0; k < 36; k++) {
+		var cell = cellAt(k);
+		var state = cell.getAttribute("data-state");
+		if (state === fhs_blocked_state) {
+			obs[k] = 1;
+			blocked.push(k);
+		} else if (isFlipState(state) && !isSolverFilled(cell)) {
+			obs[k] = Number(state);
+			var pi = FHS_PIECES.indexOf(obs[k]);
+			if (pi >= 0) counts[pi]++;
+		}
+	}
+
+	var lookingForFox = document.getElementById("lookforfox").checked;
+	var values = {
+		5: lookingForFox ? GetFoxWeight() : 0,
+		3: normalizeWeightInput("coffervalue", currentPreset().coffer),
+		4: normalizeWeightInput("swordweight", currentPreset().swords)
+	};
+	var needs = { 5: 1, 3: FHS_PIECE_SIZE[3], 4: currentPreset().swordsNeed };
+	var pattern = doFoxSightings() ? FhsIdentifyPatternFromBlocked(blocked, fhs_sheet_patterns) : -1;
+	var foxChance = GetFoxChance();
+	var sheet = pattern >= 0 ? SheetWorldsFor(pattern, foxChance) : null;
+	var W = sheet ? FhsConsistentWorlds(sheet.worlds, obs) : [];
+
+	var mode;
+	if (W.length) mode = "sheet";
+	else if (!doFoxSightings()) mode = "sheet-off";
+	else if (blocked.length < 5) mode = "need-blocked";
+	else mode = "off-sheet";
+
+	var probs = mode === "sheet" ? FhsWorldProbabilities(sheet, W) : GeometricProbabilities(lookingForFox);
+	var foxFound = counts[0] > 0;
+	return {
+		obs: obs,
+		counts: counts,
+		blocked: blocked,
+		values: values,
+		needs: needs,
+		r: Math.max(0, GetFlipsRemaining()),
+		lookingForFox: lookingForFox,
+		foxChance: foxChance,
+		foxPresent: mode === "sheet" ? (foxFound ? 1 : probs.foxPresent) : null,
+		pattern: pattern,
+		sheet: sheet,
+		W: W,
+		mode: mode,
+		probs: probs
+	};
+}
+
+// Fill in cells every remaining layout agrees on, so they show as certain-but-unflipped.
+function MarkCertainCells(analysis) {
+	var stateFor = { 3: fhs_chest_state, 4: fhs_swords_state, 5: fhs_fox_state };
+	for (var k = 0; k < 36; k++) {
+		if (analysis.obs[k] !== -1) continue;
+		var cell = cellAt(k);
+		if (isFlipState(cell.getAttribute("data-state"))) continue;
+		FHS_PIECES.forEach(function (p) {
+			if (analysis.probs[p][k] < 1 - 1e-9) return;
+			window.fhs_grid[Math.floor(k / 6)][k % 6] = p;
+			cell.setAttribute("data-state", stateFor[p]);
+			cell.setAttribute("data-solver-filled", "true");
+			UpdateCell(cell);
+		});
+	}
+}
+
+function pieceChance(analysis, k) {
+	var chance = analysis.probs[3][k] + analysis.probs[4][k];
+	if (analysis.lookingForFox) chance += analysis.probs[5][k];
+	return Math.min(1, chance);
+}
+
+function ChanceGrid(analysis) {
+	var grid = PrefillArray();
+	for (var k = 0; k < 36; k++) {
+		grid[Math.floor(k / 6)][k % 6] = analysis.obs[k] === -1 ? pieceChance(analysis, k) : NaN;
+	}
+	return grid;
+}
+
+function piecesInPlay(analysis) {
+	return FHS_PIECES.filter(function (p, pi) {
+		if (p === 5 && (!analysis.lookingForFox || analysis.foxPresent === 0)) return false;
+		return analysis.counts[pi] < analysis.needs[p];
+	});
+}
+
+function needFor(analysis, p) {
+	return Math.max(0, analysis.needs[p] - analysis.counts[FHS_PIECES.indexOf(p)]);
+}
+
+function certainCells(piece) {
+	var stateFor = { 3: fhs_chest_state, 4: fhs_swords_state, 5: fhs_fox_state };
+	var out = [];
+	for (var k = 0; k < 36; k++) {
+		var cell = cellAt(k);
+		if (isSolverFilled(cell) && cell.getAttribute("data-state") === stateFor[piece]) out.push(k);
+	}
+	return out;
+}
+
+function ClearSuggestions() {
+	var back = {};
+	back[fhs_prediction_state] = fhs_empty_state;
+	back[fhs_prediction_verified_state] = fhs_verified_state;
+	back[fhs_prediction_sighting_state] = fhs_sighting_state;
+	for (var k = 0; k < 36; k++) {
+		var cell = cellAt(k);
+		var state = cell.getAttribute("data-state");
+		if (back[state] !== undefined) {
+			cell.setAttribute("data-state", back[state]);
+			UpdateCell(cell);
+		}
+		cell.classList.remove("cell-flip-now");
+	}
+}
+
+function SuggestCell(k) {
+	var cell = cellAt(k);
+	var forward = {};
+	forward[fhs_empty_state] = fhs_prediction_state;
+	forward[fhs_verified_state] = fhs_prediction_verified_state;
+	forward[fhs_sighting_state] = fhs_prediction_sighting_state;
+	var next = forward[cell.getAttribute("data-state")];
+	if (next !== undefined) {
+		cell.setAttribute("data-state", next);
+		UpdateCell(cell);
+	}
+}
+
+function cellName(k) {
+	return "row " + (Math.floor(k / 6) + 1) + ", column " + ((k % 6) + 1);
+}
+
+function joinWords(words) {
+	if (words.length < 2) return words.join("");
+	return words.slice(0, -1).join(", ") + " and " + words[words.length - 1];
+}
+
+function chanceSummary(analysis, k) {
+	var parts = [];
+	[3, 4, 5].forEach(function (p) {
+		if (p === 5 && !analysis.lookingForFox) return;
+		var pct = Math.round(analysis.probs[p][k] * 100);
+		if (pct > 0) parts.push(pct + "% " + fhs_piece_names[p]);
+	});
+	return parts.length ? parts.join(", ") : "no piece expected";
+}
+
+// move: { cell, ties, finish } from FhsGreedyMove or the planner.
+function ShowMove(analysis, move) {
+	ClearSuggestions();
+	var headline;
+	var notes = [];
+
+	if (!analysis.blocked.length) {
+		headline = "Mark the 5 blocked tiles to start.";
+	} else if (analysis.r <= 0) {
+		headline = "No flips left.";
+	} else if (move.cell >= 0) {
+		var cells = move.ties && move.ties.length > 1 ? move.ties : [move.cell];
+		cells.forEach(SuggestCell);
+		headline =
+			cells.length > 1
+				? "Flip any ringed cell — " + cells.length + " are equally good."
+				: "Flip " + cellName(move.cell) + " — " + chanceSummary(analysis, move.cell) + ".";
+	} else if (move.finish && move.finish.length) {
+		var total = 0;
+		move.finish.forEach(function (p) {
+			certainCells(p)
+				.slice(0, needFor(analysis, p))
+				.forEach(function (k) {
+					cellAt(k).classList.add("cell-flip-now");
+					total++;
+				});
+		});
+		headline =
+			"Flip the " +
+			total +
+			" certain " +
+			joinWords(
+				move.finish.map(function (p) {
+					return fhs_piece_names[p];
+				})
+			) +
+			" cell" +
+			(total === 1 ? "" : "s") +
+			" now.";
+	} else {
+		headline = piecesInPlay(analysis).length
+			? "Nothing left worth flipping."
+			: "Everything worth finding is found.";
+	}
+
+	if (analysis.mode === "sheet") {
+		var boards = new Set(
+			analysis.W.map(function (i) {
+				return analysis.sheet.worlds[i].join("").replace(/5/g, "0");
+			})
+		).size;
+		notes.push(
+			"Matched a known board pattern: " + boards + " layout" + (boards === 1 ? "" : "s") + " still possible."
+		);
+		if (analysis.lookingForFox && analysis.counts[0] === 0) {
+			if (analysis.foxPresent === 0) {
+				notes.push("Every recorded Fox spot is empty, so this game has no Fox.");
+			} else {
+				notes.push("Chance this game has a Fox: " + Math.round(analysis.foxPresent * 100) + "%.");
+			}
+		}
+	} else if (analysis.mode === "off-sheet") {
+		notes.push("This board isn't in the community sheet, so odds come from fitting the shapes.");
+	} else if (analysis.mode === "need-blocked" && analysis.blocked.length) {
+		notes.push("Mark all 5 blocked tiles to match a known board pattern.");
+	}
+
+	var outOfReach = piecesInPlay(analysis).filter(function (p) {
+		return analysis.r > 0 && needFor(analysis, p) > analysis.r;
+	});
+
+	if (move.cell >= 0) {
+		piecesInPlay(analysis).forEach(function (p) {
+			if (outOfReach.indexOf(p) >= 0) return;
+			var waiting = certainCells(p);
+			if (!waiting.length) return;
+			var need = needFor(analysis, p);
+			var name = fhs_piece_names[p];
+			if (need < waiting.length) {
+				notes.push(
+					"The " +
+						waiting.length +
+						" dashed " +
+						name +
+						" cells are certain and you only need " +
+						need +
+						". Flip " +
+						(need === 1 ? "it" : "them") +
+						" last; " +
+						(need === 1 ? "it" : "they") +
+						" won't tell you anything new."
+				);
+			} else {
+				notes.push(
+					"The " +
+						waiting.length +
+						" dashed " +
+						name +
+						" cell" +
+						(waiting.length === 1
+							? " is certain. Flip it last; it won't tell you anything new."
+							: "s are certain. Flip them last; they won't tell you anything new.")
+				);
+			}
+		});
+	}
+
+	outOfReach.forEach(function (p) {
+		notes.push(
+			"The " +
+				fhs_piece_names[p] +
+				" can't be finished: " +
+				needFor(analysis, p) +
+				" cell" +
+				(needFor(analysis, p) === 1 ? "" : "s") +
+				" left, " +
+				analysis.r +
+				" flip" +
+				(analysis.r === 1 ? "" : "s") +
+				". Where it could be is outlined."
+		);
+	});
+
+	RenderInsights(analysis, outOfReach);
+	RenderStatus(headline, notes, analysis.planning);
+}
+
+function RenderInsights(analysis, outOfReach) {
+	for (var k = 0; k < 36; k++) {
+		var cell = cellAt(k);
+		var open = analysis.obs[k] === -1 && !isSolverFilled(cell) && analysis.blocked.length > 0;
+		var chance = open ? pieceChance(analysis, k) : 0;
+		cell.style.setProperty("--heat", chance.toFixed(3));
+		var unflipped = analysis.obs[k] === -1;
+		var unreachable =
+			unflipped &&
+			outOfReach.some(function (p) {
+				return analysis.probs[p][k] > 0;
+			});
+		cell.classList.toggle("cell-out-of-reach", unreachable);
+	}
+}
+
+function RenderStatus(headline, notes, planning) {
+	var head = document.getElementById("prediction-live");
+	var list = document.getElementById("status-notes");
+	var status = document.getElementById("status");
+	if (head) head.textContent = headline;
+	if (status) status.classList.toggle("status-planning", !!planning);
+	if (!list) return;
+	list.textContent = "";
+	notes.forEach(function (note) {
+		var li = document.createElement("li");
+		li.textContent = note;
+		list.appendChild(li);
+	});
+}
+
+var fhs_plan_request = 0;
+var fhs_plan_worker = null;
+var fhs_local_planner = null;
+
+function planKey(analysis) {
+	var v = analysis.values;
+	return analysis.pattern + "|" + analysis.foxChance + "|" + v[5] + "," + v[3] + "," + v[4] + "|" + analysis.needs[4];
+}
+
+function ApplyPlan(id, result) {
+	if (id !== fhs_plan_request || !window.fhs_analysis) return;
+	window.fhs_analysis.planning = false;
+	ShowMove(window.fhs_analysis, { cell: result.cell, ties: [], finish: result.finish });
+}
+
+function RequestPlan(analysis) {
+	var id = ++fhs_plan_request;
+	var message = {
+		id: id,
+		pattern: analysis.pattern,
+		foxChance: analysis.foxChance,
+		values: analysis.values,
+		W: analysis.W,
+		counts: analysis.counts,
+		needs: analysis.needs,
+		r: analysis.r
+	};
+	if (fhs_plan_worker === null && window.Worker) {
+		try {
+			fhs_plan_worker = new Worker("planner-worker.js?v=27");
+			fhs_plan_worker.onmessage = function (e) {
+				ApplyPlan(e.data.id, e.data.result);
+			};
+			fhs_plan_worker.onerror = function () {
+				fhs_plan_worker = false;
+				if (window.fhs_analysis && window.fhs_analysis.planning) RequestPlan(window.fhs_analysis);
+			};
+		} catch (e) {
+			fhs_plan_worker = false;
+		}
+	}
+	if (fhs_plan_worker) {
+		fhs_plan_worker.postMessage(message);
+		return;
+	}
+	// No worker (e.g. opened from file://): plan on the page after the quick suggestion paints.
+	setTimeout(function () {
+		if (id !== fhs_plan_request) return;
+		var key = planKey(analysis);
+		if (!fhs_local_planner || fhs_local_planner.key !== key) {
+			fhs_local_planner = { key: key, planner: new FhsPlanner(analysis.sheet, analysis.values, analysis.needs) };
+		}
+		ApplyPlan(id, fhs_local_planner.planner.best(analysis.W, analysis.counts, analysis.r));
+	}, 50);
 }
 
 function GetFlipsRemaining() {
 	return fhs_flip_budget - window.fhs_flips_used;
-}
-
-function countConfirmedPieceCells(state) {
-	var hitCount = 0;
-	for (var i = 0; i < 6; i++) {
-		for (var j = 0; j < 6; j++) {
-			if (window.fhs_grid[i][j] != state) continue;
-			var cell = document.getElementById("cell" + IndexFormat(j + 6 * i));
-			if (cell.getAttribute("data-solver-filled") !== "true") hitCount++;
-		}
-	}
-	return hitCount;
-}
-
-// Swords is a 2x3 block (6 cells), coffer is 2x2 (4 cells). Solver-filled
-// cells are deductions until the player confirms the corresponding flips.
-function MinFlipsToCompleteSwords() {
-	return 6 - countConfirmedPieceCells(4);
-}
-
-function MinFlipsToCompleteCoffer() {
-	return 4 - countConfirmedPieceCells(3);
 }
 
 function normalizeWeightInput(id, fallback) {
@@ -1287,53 +1597,8 @@ function normalizeWeightInput(id, fallback) {
 	return value;
 }
 
-// A coffer is always the medium reward in this solver. Its default reward value
-// is used for expected-value scoring and can be adjusted as a strategy value.
-function GetCofferValue() {
-	var base = normalizeWeightInput("coffervalue", fhs_coffer_value);
-	return MinFlipsToCompleteCoffer() > GetFlipsRemaining() ? 0 : base;
-}
-
-function GetSwordsWeight() {
-	var base = normalizeWeightInput(
-		"swordweight",
-		document.getElementById("gameweek1").checked ? fhs_sword_weight_hunting_retelling : fhs_sword_weight_raw
-	);
-	return MinFlipsToCompleteSwords() > GetFlipsRemaining() ? 0 : base;
-}
-
 function GetFoxWeight() {
 	return normalizeWeightInput("foxweight", 100);
-}
-
-function weightedScores(probs) {
-	var newScores = PrefillArray();
-	var foxWeight = GetFoxWeight();
-	var cofferValue = GetCofferValue();
-	var swordsWeight = GetSwordsWeight();
-	for (var i = 0; i < 6; i++) {
-		for (var j = 0; j < 6; j++) {
-			var foxWeighted = probs[0][i][j] * foxWeight;
-			var cofferWeighted = probs[1][i][j] * cofferValue;
-			var swordsWeighted = probs[2][i][j] * swordsWeight;
-			newScores[i][j] = foxWeighted + cofferWeighted + swordsWeighted;
-		}
-	}
-	return newScores;
-}
-
-function weightedWFScores(probs) {
-	var newScores = PrefillArray();
-	var cofferValue = GetCofferValue();
-	var swordsWeight = GetSwordsWeight();
-	for (var i = 0; i < 6; i++) {
-		for (var j = 0; j < 6; j++) {
-			var cofferWeighted = probs[0][i][j] * cofferValue;
-			var swordsWeighted = probs[1][i][j] * swordsWeight;
-			newScores[i][j] = cofferWeighted + swordsWeighted;
-		}
-	}
-	return newScores;
 }
 
 function NaiiveLargeProb() {
